@@ -16,8 +16,9 @@
 </script>
 
 <div class="max-w-screen-xl p-4 w-full mx-auto">
+	<!-- navbar -->
 	<div
-		class="border-b -mx-4 -mt-4 p-1 px-4 flex flex-wrap justify-between items-center sticky top-0 bg-background"
+		class="border-b -mx-4 -mt-4 p-1 px-4 flex flex-wrap justify-between items-center sticky top-0 z-50 bg-background"
 	>
 		<a class="text-lg font-semibold" href="/">Prosper Mint</a>
 
