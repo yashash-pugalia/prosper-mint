@@ -49,7 +49,7 @@
 				Your Passport to Financial Mastery.
 			</h2>
 
-			<p class="text-lg opacity-60">
+			<p class="text-lg opacity-60 w-3/4">
 				Seamlessly monitor your financial world with Prosper Mint, a dynamic personal finance
 				tracking marvel. It transforms chaos into clarity, effortlessly handling expenses,
 				investments, and cash flow. Unlock insights into your financial well-being and embark on a
