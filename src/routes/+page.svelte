@@ -10,19 +10,23 @@
 	});
 </script>
 
+<!-- just to get transition working -->
 {#if loaded}
-	<div class="mx-auto w-max flex flex-col gap-4 items-center" transition:fly={{ y: -10 }}>
+	<div
+		class="mx-auto w-max flex flex-col gap-4 items-center min-h-[calc(100vh-50px)] border-b"
+		transition:fly={{ y: -10 }}
+	>
 		<h1
-			class="text-8xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mt-12"
+			class="text-6xl sm:text-8xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mt-12"
 		>
 			Prosper Mint
 		</h1>
 
-		<h1 class="text-4xl font-semibold">Get in charge of your money.</h1>
+		<h1 class="text-2xl sm:text-4xl font-semibold">Get in charge of your money.</h1>
 
 		<Button href="/signup" class="mt-2">Get Started</Button>
 
-		<p class="text-lg mt-8">
+		<p class="text-lg mt-8 text-center max-w-[calc(100vw-2rem)]">
 			Get a clear picture of your finances. So you can make better decisions and lead a healthier
 			financial life.
 		</p>
