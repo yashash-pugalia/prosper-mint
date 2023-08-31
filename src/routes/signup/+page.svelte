@@ -1,44 +1,37 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import * as Card from '$lib/components/ui/card';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { goto } from '$app/navigation';
 </script>
 
-<Card.Root class="w-96 m-auto mt-6">
-	<Card.Header class="space-y-1">
-		<Card.Title class="text-2xl">Create an account</Card.Title>
-		<Card.Description>Enter your email below to create your account</Card.Description>
-	</Card.Header>
-	<Card.Content class="grid gap-4">
-		<div class="grid grid-cols-2 gap-6">
-			<Button variant="outline">
-				<!-- <Icons.gitHub class="mr-2 h-4 w-4" /> -->
-				Github
-			</Button>
-			<Button variant="outline">
-				<!-- <Icons.google class="mr-2 h-4 w-4" /> -->
-				Google
-			</Button>
+<div class="hero mt-32">
+	<div class="hero-content flex-col lg:flex-row-reverse">
+		<div class="text-center lg:text-left">
+			<h1 class="text-5xl font-bold">Login now!</h1>
+			<p class="py-6">
+				Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
+				quasi. In deleniti eaque aut repudiandae et a id nisi.
+			</p>
 		</div>
-		<div class="relative">
-			<div class="absolute inset-0 flex items-center">
-				<span class="w-full border-t" />
-			</div>
-			<div class="relative flex justify-center text-xs uppercase">
-				<span class="bg-card px-2 text-muted-foreground"> Or continue with </span>
-			</div>
+		<div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+			<form class="card-body" on:submit|preventDefault={() => goto('/app')}>
+				<div class="form-control">
+					<label class="label" for="">
+						<span class="label-text">Email</span>
+					</label>
+					<input type="email" placeholder="email" class="input input-bordered" required />
+				</div>
+				<div class="form-control">
+					<label class="label" for="">
+						<span class="label-text">Password</span>
+					</label>
+					<input type="password" placeholder="password" class="input input-bordered" required />
+					<label class="label" for="">
+						<a href="/#" class="label-text-alt link link-hover">Forgot password?</a>
+					</label>
+				</div>
+				<div class="form-control mt-6">
+					<button class="btn btn-primary">Login</button>
+				</div>
+			</form>
 		</div>
-		<div class="grid gap-2">
-			<Label for="email">Email</Label>
-			<Input id="email" type="email" placeholder="hello@example.com" />
-		</div>
-		<div class="grid gap-2">
-			<Label for="password">Password</Label>
-			<Input id="password" type="password" placeholder="not 1234..." />
-		</div>
-	</Card.Content>
-	<Card.Footer>
-		<Button class="w-full">Create account</Button>
-	</Card.Footer>
-</Card.Root>
+	</div>
+</div>
