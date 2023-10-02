@@ -16,8 +16,7 @@
 </script>
 
 <div class="max-w-screen-xl p-4 w-full mx-auto">
-	<!-- navbar -->
-	<div
+	<nav
 		class="border-b -mx-4 -mt-4 p-1 px-4 flex flex-wrap justify-between items-center sticky top-0 z-50 bg-background"
 	>
 		<a class="text-lg font-semibold" href="/">Prosper Mint</a>
@@ -34,6 +33,16 @@
 				<Button variant="link">Privacy</Button>
 			</div>
 		{/if}
-	</div>
+	</nav>
+
+	<!-- main page -->
 	<slot />
+
+	<footer class="flex -mx-4 -mb-4 px-4 p-1 gap-2 border-t">
+		{#each [{ icon: 'mdi:twitter', href: 'https://twitter.com/yashash_pugalia' }, { icon: 'mdi:github', href: 'https://github.com/yashash-pugalia' }, { icon: 'mdi:linkedin', href: 'https://www.linkedin.com/in/yashash-pugalia/' }] as e}
+			<Button variant="ghost" size="icon" href={e.href}>
+				<Icon icon={e.icon} class="text-xl" />
+			</Button>
+		{/each}
+	</footer>
 </div>
