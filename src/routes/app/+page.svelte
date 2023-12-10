@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { persisted } from 'svelte-persisted-store';
-	// import { toast } from 'svelte-sonner';
+	import { fly } from 'svelte/transition';
 
 	let newAmount: number | undefined;
 
@@ -59,14 +59,18 @@
 
 		newAmount = undefined;
 	};
+
+	// onMount(() => {
+	// $transactions = $transactions.sort((a, b) => (a.date > b.date ? -1 : 1));
+	// });
 </script>
 
-<div class="flex flex-col gap-2 pt-4">
+<div class="flex flex-col gap-2 py-4">
 	<div class="flex mx-auto">
 		<input
 			class="input input-bordered rounded-r-none"
 			type="number"
-			placeholder="₹ {(Math.random() * 1000).toFixed(2)}"
+			placeholder="Enter Amount"
 			bind:value={newAmount}
 		/>
 		<button on:click={addTransaction} class="btn btn-neutral rounded-l-none">Add</button>
@@ -86,14 +90,18 @@
 						<th>Merchant/Payee/Payer</th>
 						<th>Tag</th>
 						<th>Bank</th>
-						<th>More</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each $transactions as t}
 						<tr class="hover" on:click={() => (showDetailsId = showDetailsId === t.id ? 0 : t.id)}>
 							<td>
-								<input type="checkbox" class="checkbox" bind:checked={t.checked} />
+								<input
+									type="checkbox"
+									class="checkbox"
+									bind:checked={t.checked}
+									on:click|stopPropagation
+								/>
 							</td>
 							<td>
 								<p>
@@ -117,31 +125,17 @@
 								</span>
 							</td>
 							<td>
-								<input
-									class="input"
-									type="text"
-									placeholder="Start typing to add..."
-									bind:value={t.merchant}
-								/>
+								<select class="select" bind:value={t.merchant} on:click|stopPropagation>
+									{#each merchants as merchant}
+										<option>{merchant}</option>
+									{/each}
+								</select>
 							</td>
 							<td>
 								<div class="badge badge-ghost">{t.tag}</div>
 							</td>
 							<td>
 								<img class="w-8 h-8" src="/bank-logos/{t.bank.toLowerCase()}.png" alt="" />
-							</td>
-							<td>
-								<button
-									class="btn btn-sm btn-square btn-ghost"
-									on:click={() => (showDetailsId = showDetailsId === t.id ? 0 : t.id)}
-								>
-									<Icon
-										icon="material-symbols:chevron-{showDetailsId === t.id
-											? 'left'
-											: 'right'}-rounded"
-										class="text-lg"
-									/>
-								</button>
 							</td>
 						</tr>
 					{/each}
@@ -150,39 +144,90 @@
 		</div>
 
 		{#each $transactions as t}
-			<div
-				class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded"
-				class:hidden={showDetailsId !== t.id}
-			>
-				<div class="flex items-center justify-between gap-2">
-					<p class="font-semibold text-lg">
-						{t.amount.toLocaleString(undefined, {
-							style: 'currency',
-							currency: 'INR'
-						})}
-					</p>
+			{#if t.id === showDetailsId}
+				<div
+					class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded sticky top-[52px] h-max"
+					in:fly={{ y: 32 }}
+				>
+					<div class="flex items-center justify-between gap-2">
+						<p class="font-semibold text-lg">
+							{t.amount.toLocaleString(undefined, {
+								style: 'currency',
+								currency: 'INR'
+							})}
+						</p>
 
-					<button class="btn btn-sm btn-square" on:click={() => (showDetailsId = 0)}>
-						<Icon icon="material-symbols:chevron-left-rounded" class="text-lg" />
+						<button class="btn btn-sm btn-square" on:click={() => (showDetailsId = 0)}>
+							<Icon icon="material-symbols:chevron-left-rounded" class="text-lg" />
+						</button>
+					</div>
+
+					<label class="form-control">
+						<div class="label">
+							<span class="label-text">Type</span>
+						</div>
+						<select class="select select-bordered" bind:value={t.type}>
+							<option>income</option>
+							<option>expense</option>
+						</select>
+					</label>
+
+					<label class="form-control">
+						<div class="label">
+							<span class="label-text">Tags</span>
+						</div>
+
+						<select class="select select-bordered" bind:value={t.tag}>
+							{#each tags as tag}
+								<option>{tag}</option>
+							{/each}
+						</select>
+					</label>
+
+					<label class="form-control">
+						<div class="label">
+							<span class="label-text">Bank</span>
+						</div>
+						<select class="select select-bordered" bind:value={t.bank}>
+							{#each banks as bank}
+								<option>{bank}</option>
+							{/each}
+						</select>
+					</label>
+
+					<label class="form-control">
+						<div class="label">
+							<span class="label-text">Merchant</span>
+						</div>
+						<select class="select select-bordered" bind:value={t.merchant}>
+							{#each merchants as merchant}
+								<option>{merchant}</option>
+							{/each}
+						</select>
+					</label>
+
+					<label class="form-control">
+						<div class="label">
+							<span class="label-text">Notes</span>
+						</div>
+						<textarea
+							class="textarea textarea-bordered w-full"
+							placeholder="Notes"
+							bind:value={t.notes}
+						/>
+					</label>
+
+					<button
+						class="btn btn-error"
+						on:click={() => {
+							$transactions = $transactions.filter((transaction) => transaction.id !== t.id);
+							showDetailsId = 0;
+						}}
+					>
+						Delete
 					</button>
 				</div>
-				<select class="select select-bordered">
-					{#each tags as tag}
-						<option>{tag}</option>
-					{/each}
-				</select>
-				<select class="select select-bordered">
-					{#each banks as bank}
-						<option>{bank}</option>
-					{/each}
-				</select>
-				<select class="select select-bordered">
-					{#each merchants as merchant}
-						<option>{merchant}</option>
-					{/each}
-				</select>
-				<textarea class="textarea textarea-bordered w-full" placeholder="Notes" />
-			</div>
+			{/if}
 		{/each}
 	</div>
 </div>

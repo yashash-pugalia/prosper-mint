@@ -1,23 +1,26 @@
 <script>
 	import Icon from '@iconify/svelte';
-	// import { Toaster, toast } from 'svelte-sonner';
+	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import 'tailwindcss/tailwind.css';
 
-	let showNav = true;
+	let showNav = false;
 
-	// toast.warning('Event has warnings');
+	// onMount(() => {
+	// 	window.addEventListener('resize', () => {
+	// 		if (window.innerWidth > 640) showNav = true;
+	// 		else showNav = false;
+	// 	});
+	// });
 </script>
-
-<!-- <Toaster /> -->
 
 <div class="max-w-screen-xl p-4 w-full mx-auto min-h-screen">
 	<nav
-		class="border-b border-base-content/20 -mx-4 -mt-4 py-2 px-4 flex flex-wrap justify-between items-center sticky top-0 z-50 bg-background"
+		class="border-b border-base-content/20 -mx-4 -mt-4 py-2 px-4 flex flex-wrap justify-between items-center sticky top-0 z-50 bg-base-100"
 	>
 		<a class="text-lg font-semibold" href="/">Prosper Mint</a>
 
-		<button on:click={() => (showNav = !showNav)} class="btn sm:hidden">
+		<button on:click={() => (showNav = !showNav)} class="btn btn-sm btn-ghost btn-square sm:hidden">
 			<Icon icon="material-symbols:menu-rounded" class="text-xl" />
 		</button>
 
@@ -28,7 +31,7 @@
 				<a href="/" class="link link-hover">Blog</a>
 				<a href="/" class="link link-hover">Privacy</a>
 
-				<label class="flex gap-1 items-center cursor-pointer ml-auto">
+				<label class="flex gap-1 items-center cursor-pointer">
 					<Icon icon="material-symbols:sunny-outline-rounded" class="text-xl" />
 					<input type="checkbox" value="dark" class="toggle theme-controller" />
 					<Icon icon="material-symbols:nightlight-outline-rounded" class="text-xl" />
@@ -37,7 +40,6 @@
 		{/if}
 	</nav>
 
-	<!-- main page -->
 	<slot />
 
 	<footer class="flex -mx-4 -mb-4 px-4 p-1 gap-2 border-t border-base-content/20 sticky top-full">

@@ -34,9 +34,8 @@
 					<p class="text-lg font-medium">Download the app</p>
 					<p class="text-slate-500">Currently in invite only Beta</p>
 				</div>
-				<div class="bg-base-200 w-20 h-20 rounded">
-					<!-- add a QR code -->
-				</div>
+				<!-- add a QR code -->
+				<div class="bg-base-200 w-20 h-20 rounded"></div>
 			</div>
 		</section>
 		<section class="flex flex-col gap-4 items-center min-h-[calc(100vh-50px)] border-b">
