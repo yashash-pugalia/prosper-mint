@@ -22,14 +22,16 @@
 
 			<h2 class="text-2xl sm:text-4xl lg:text-5xl font-semibold">Get in charge of your money.</h2>
 
-			<a class="btn btn-neutral mt-2" href="/app">Get Started</a>
+			<a class="btn btn-neutral mt-2" href="/signup">Get Started</a>
 
 			<p class="text-lg mt-8 text-center">
 				Get a clear picture of your finances. So you can make better decisions and lead a healthier
 				financial life.
 			</p>
 
-			<div class="flex border gap-2 p-2 rounded items-center mt-2">
+			<div
+				class="flex border border-base-content/20 gap-2 p-2 rounded items-center mt-2 bg-base-100"
+			>
 				<div class="p-4">
 					<p class="text-lg font-medium">Download the app</p>
 					<p class="text-slate-500">Currently in invite only Beta</p>
@@ -38,7 +40,7 @@
 				<div class="bg-base-200 w-20 h-20 rounded"></div>
 			</div>
 		</section>
-		<section class="flex flex-col gap-4 items-center min-h-[calc(100vh-50px)] border-b">
+		<section class="flex flex-col gap-4 items-center min-h-[calc(100vh-50px)]">
 			<img src="screenshot.png" alt="" class="w-3/4 -translate-y-1/4" />
 
 			<h2 class="text-2xl sm:text-4xl lg:text-5xl font-semibold">
@@ -52,7 +54,7 @@
 				journey of smart financial habits.
 			</p>
 
-			<p>Your compass in the sea of finance, your mentor to financial prowess.</p>
+			<p class="mb-8">Your compass in the sea of finance, your mentor to financial prowess.</p>
 		</section>
 	{/if}
 </div>

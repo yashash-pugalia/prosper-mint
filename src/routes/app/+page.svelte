@@ -72,6 +72,9 @@
 			type="number"
 			placeholder="Enter Amount"
 			bind:value={newAmount}
+			on:keypress={(e) => {
+				if (e.key === 'Enter') addTransaction();
+			}}
 		/>
 		<button on:click={addTransaction} class="btn btn-neutral rounded-l-none">Add</button>
 	</div>

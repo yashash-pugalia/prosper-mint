@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 </script>
 
-<div class="hero min-h-screen bg-base-200">
+<div class="hero mt-32">
 	<div class="hero-content flex-col lg:flex-row-reverse">
 		<div class="text-center lg:text-left">
 			<h1 class="text-5xl font-bold">Login now!</h1>
@@ -11,7 +12,7 @@
 			</p>
 		</div>
 		<div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-			<form class="card-body">
+			<form class="card-body" on:submit|preventDefault={() => goto('/app')}>
 				<div class="form-control">
 					<label class="label" for="">
 						<span class="label-text">Email</span>
