@@ -1,40 +1,12 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import { persisted } from 'svelte-persisted-store';
-	import { fly } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
+	import { banks, merchants, tags, transactions } from '../store';
 
 	let newAmount: number | undefined;
-
+	let search = '';
 	let showDetailsId = 0;
-
-	const transactions = persisted('transactions', [
-		{
-			id: 1,
-			checked: false,
-			date: '2021-08-01T12:00:00',
-			type: 'income',
-			amount: 50000,
-			merchant: 'Amazon',
-			tag: 'Salary',
-			bank: 'HDFC',
-			notes: 'Salary for the month of July'
-		},
-		{
-			id: 2,
-			checked: false,
-			date: '2021-08-01T12:00:00',
-			type: 'expense',
-			amount: 300,
-			merchant: 'Swiggy',
-			tag: 'Food',
-			bank: 'SBI',
-			notes: 'Lunch'
-		}
-	]);
-
-	const tags = ['Salary', 'Food', 'Shopping', 'Travel', 'Bills', 'Others'];
-	const banks = ['SBI', 'HDFC', 'ICICI'];
-	const merchants = ['Amazon', 'Swiggy', 'Zomato', 'Flipkart', 'BigBasket', 'Grofers'];
+	let filterTransactionType: 'income' | 'expense' | 'all' = 'all';
 
 	const addTransaction = () => {
 		if (!newAmount) {
@@ -59,10 +31,6 @@
 
 		newAmount = undefined;
 	};
-
-	// onMount(() => {
-	// $transactions = $transactions.sort((a, b) => (a.date > b.date ? -1 : 1));
-	// });
 </script>
 
 <div class="flex flex-col gap-2 py-4">
@@ -79,13 +47,169 @@
 		<button on:click={addTransaction} class="btn btn-neutral rounded-l-none">Add</button>
 	</div>
 
+	{#if $transactions.filter((t) => t.checked).length > 0}
+		<div
+			class="bg-base-100 flex items-center gap-2 p-2 rounded border border-base-content/20"
+			transition:slide
+		>
+			<div class="dropdown">
+				<div tabindex="0" role="button" class="btn btn-sm">Tag all</div>
+				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+				<ul
+					tabindex="0"
+					class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+				>
+					{#each tags as t}
+						<li>
+							<button
+								on:click={() => {
+									$transactions = $transactions.map((tr) => {
+										if (tr.checked) {
+											tr.tag = t;
+											tr.checked = false;
+										}
+										return tr;
+									});
+								}}
+							>
+								{t}
+							</button>
+						</li>
+					{/each}
+				</ul>
+			</div>
+
+			<div class="dropdown">
+				<div tabindex="0" role="button" class="btn btn-sm">Edit Merchant/Payee/Payer</div>
+				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+				<ul
+					tabindex="0"
+					class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+				>
+					{#each merchants as m}
+						<li>
+							<button
+								on:click={() => {
+									$transactions = $transactions.map((tr) => {
+										if (tr.checked) {
+											tr.merchant = m;
+											tr.checked = false;
+										}
+										return tr;
+									});
+								}}
+							>
+								{m}
+							</button>
+						</li>
+					{/each}
+				</ul>
+			</div>
+
+			<button
+				class="btn btn-sm hover:btn-error"
+				on:click={() => {
+					$transactions = $transactions.map((t) => {
+						t.checked = false;
+						return t;
+					});
+				}}
+			>
+				Deselect All
+			</button>
+
+			<ul class="flex gap-2 text-sm font-light m-2 ml-auto">
+				<div class="badge badge-neutral">
+					{$transactions.filter((t) => t.checked).length} selected
+				</div>
+
+				<li>
+					+ {$transactions
+						.filter((t) => t.checked && t.type === 'income')
+						.reduce((a, b) => a + b.amount, 0)
+						.toLocaleString(undefined, {
+							style: 'currency',
+							currency: 'INR'
+						})}
+				</li>
+				<li>
+					- {$transactions
+						.filter((t) => t.checked && t.type === 'expense')
+						.reduce((a, b) => a + b.amount, 0)
+						.toLocaleString(undefined, {
+							style: 'currency',
+							currency: 'INR'
+						})}
+				</li>
+			</ul>
+		</div>
+	{/if}
+
 	<div class="flex gap-2 w-full">
 		<div
-			class="bg-base-100 w-full border border-base-content/20 rounded overflow-x-auto transition"
+			class="bg-base-100 flex flex-col w-full border border-base-content/20 rounded overflow-x-auto transition"
 		>
+			<div class="bg-base-200 border border-base-content/20 flex flex-col gap-2 rounded m-2 p-1">
+				<input
+					class="input input-bordered"
+					type="text"
+					placeholder="Search Transactions..."
+					bind:value={search}
+				/>
+
+				<div class="bg-base-100 tabs tabs-boxed mr-auto border border-base-content/20">
+					<button
+						class="tab"
+						class:tab-active={filterTransactionType === 'all'}
+						on:click={() => (filterTransactionType = 'all')}
+					>
+						All
+					</button>
+					<button
+						class="tab"
+						class:tab-active={filterTransactionType === 'income'}
+						on:click={() => (filterTransactionType = 'income')}
+					>
+						Income
+					</button>
+					<button
+						class="tab"
+						class:tab-active={filterTransactionType === 'expense'}
+						on:click={() => (filterTransactionType = 'expense')}
+					>
+						Expense
+					</button>
+				</div>
+			</div>
+
+			<ul class="flex gap-2 text-sm font-light m-2 ml-auto">
+				<li>
+					{$transactions.length} transactions
+				</li>
+
+				<li>
+					+ {$transactions
+						.filter((t) => t.type === 'income')
+						.reduce((a, b) => a + b.amount, 0)
+						.toLocaleString(undefined, {
+							style: 'currency',
+							currency: 'INR'
+						})}
+				</li>
+
+				<li>
+					- {$transactions
+						.filter((t) => t.type === 'expense')
+						.reduce((a, b) => a + b.amount, 0)
+						.toLocaleString(undefined, {
+							style: 'currency',
+							currency: 'INR'
+						})}
+				</li>
+			</ul>
+
 			<table class="table">
-				<!-- class="sr-only" -->
-				<thead>
+				<thead class="sr-only">
 					<tr>
 						<th>Select</th>
 						<th>Date</th>
@@ -97,7 +221,15 @@
 				</thead>
 				<tbody>
 					{#each $transactions as t}
-						<tr class="hover" on:click={() => (showDetailsId = showDetailsId === t.id ? 0 : t.id)}>
+						<tr
+							class="hover"
+							on:click={() => (showDetailsId = showDetailsId === t.id ? 0 : t.id)}
+							class:hidden={(!t.merchant.toLowerCase().includes(search.toLowerCase()) &&
+								!t.tag.toLowerCase().includes(search.toLowerCase()) &&
+								!t.bank.toLowerCase().includes(search.toLowerCase()) &&
+								!t.notes.toLowerCase().includes(search.toLowerCase())) ||
+								(filterTransactionType !== 'all' && t.type !== filterTransactionType)}
+						>
 							<td>
 								<input
 									type="checkbox"
@@ -200,7 +332,7 @@
 
 					<label class="form-control">
 						<div class="label">
-							<span class="label-text">Merchant</span>
+							<span class="label-text">Merchant/Payee/Payer</span>
 						</div>
 						<select class="select select-bordered" bind:value={t.merchant}>
 							{#each merchants as merchant}
@@ -223,7 +355,7 @@
 					<button
 						class="btn btn-error"
 						on:click={() => {
-							$transactions = $transactions.filter((transaction) => transaction.id !== t.id);
+							$transactions = $transactions.filter((tr) => tr.id !== t.id);
 							showDetailsId = 0;
 						}}
 					>

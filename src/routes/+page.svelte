@@ -11,7 +11,7 @@
 	<!-- just to get transition working -->
 	{#if loaded}
 		<section
-			class="flex flex-col gap-4 items-center min-h-[calc(100vh-50px)] border-b"
+			class="flex flex-col gap-4 items-center min-h-[calc(100vh-50px)] border-b border-base-content/20"
 			transition:slide
 		>
 			<h1
