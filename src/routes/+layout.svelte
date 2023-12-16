@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import 'tailwindcss/tailwind.css';
+	import { themeChange } from 'theme-change';
 
 	let showNav = true;
 
@@ -11,6 +12,8 @@
 			if (window.innerWidth > 640) showNav = true;
 			else showNav = false;
 		});
+
+		themeChange(false);
 	});
 </script>
 
@@ -26,12 +29,6 @@
 
 		{#if showNav}
 			<div class="flex gap-4 flex-col w-full sm:w-auto sm:flex-row" transition:slide>
-				<label class="swap swap-rotate">
-					<input type="checkbox" class="theme-controller" value="dark" />
-					<Icon icon="material-symbols:sunny-outline-rounded" class="text-lg swap-on" />
-					<Icon icon="material-symbols:nightlight-outline-rounded" class="text-lg swap-off" />
-				</label>
-
 				<a href="/signup" class="link link-hover">Sign Up</a>
 				<a href="/app" class="link link-hover">App</a>
 				<a href="/" class="link link-hover">Blog</a>
@@ -50,6 +47,26 @@
 				<Icon icon={e.icon} class="text-xl" />
 			</a>
 		{/each}
+
+		<div class="flex rounded-full ml-auto">
+			<button
+				class="btn btn-sm btn-circle btn-ghost"
+				data-set-theme="dark"
+				data-act-class="btn-active"
+			>
+				<Icon icon="material-symbols:nightlight-outline-rounded" class="text-lg" />
+			</button>
+			<button
+				class="btn btn-sm btn-circle btn-ghost"
+				data-set-theme="light"
+				data-act-class="btn-active"
+			>
+				<Icon icon="material-symbols:sunny-outline-rounded" class="text-lg" />
+			</button>
+			<button class="btn btn-sm btn-circle btn-ghost" data-set-theme="" data-act-class="btn-active">
+				<Icon icon="material-symbols:desktop-windows-outline-rounded" class="text-lg" />
+			</button>
+		</div>
 	</footer>
 </div>
 

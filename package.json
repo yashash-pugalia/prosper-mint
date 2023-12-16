@@ -30,6 +30,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"svelte-persisted-store": "^0.7.0"
+		"svelte-persisted-store": "^0.7.0",
+		"theme-change": "^2.5.0"
 	}
 }
