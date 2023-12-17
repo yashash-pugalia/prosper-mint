@@ -30,97 +30,11 @@
 		<button class="btn btn-neutral rounded-l-none" type="submit">Add</button>
 	</form>
 
-	{#if selectedTrIds.length}
-		<div
-			class="bg-base-100 flex items-center gap-2 p-2 rounded border border-base-content/20"
-			transition:slide
-		>
-			<div class="dropdown">
-				<div tabindex="0" role="button" class="btn btn-sm">Tag all</div>
-				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-				<ul
-					tabindex="0"
-					class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-				>
-					{#each tags as t}
-						<li>
-							<button
-								on:click={() => {
-									data.transactions = data.transactions.map((tr) => {
-										if (selectedTrIds.includes(tr.id)) tr.tag = t;
-										return tr;
-									});
-								}}
-							>
-								{t}
-							</button>
-						</li>
-					{/each}
-				</ul>
-			</div>
-
-			<div class="dropdown">
-				<div tabindex="0" role="button" class="btn btn-sm">Edit Merchant/Payee/Payer</div>
-				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-				<ul
-					tabindex="0"
-					class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-				>
-					{#each merchants as m}
-						<li>
-							<button
-								on:click={() => {
-									data.transactions = data.transactions.map((tr) => {
-										if (selectedTrIds.includes(tr.id)) tr.merchant = m;
-										return tr;
-									});
-								}}
-							>
-								{m}
-							</button>
-						</li>
-					{/each}
-				</ul>
-			</div>
-
-			<button class="btn btn-sm hover:btn-error" on:click={() => (selectedTrIds = [])}>
-				Deselect All
-			</button>
-
-			<ul class="flex gap-2 text-sm font-light m-2 ml-auto">
-				<div class="badge badge-neutral">
-					{selectedTrIds.length} selected
-				</div>
-
-				<li>
-					{data.transactions
-						.filter((t) => selectedTrIds.includes(t.id) && t.amount > 0)
-						.reduce((a, b) => a + b.amount, 0)
-						.toLocaleString('en-IN', {
-							style: 'currency',
-							currency: 'INR',
-							signDisplay: 'exceptZero'
-						})}
-				</li>
-				<li>
-					{data.transactions
-						.filter((t) => selectedTrIds.includes(t.id) && t.amount < 0)
-						.reduce((a, b) => a + b.amount, 0)
-						.toLocaleString('en-IN', {
-							style: 'currency',
-							currency: 'INR',
-							signDisplay: 'exceptZero'
-						})}
-				</li>
-			</ul>
-		</div>
-	{/if}
-
 	<div class="flex gap-2 w-full">
 		<div
-			class="bg-base-100 flex flex-col w-full border border-base-content/20 rounded overflow-x-auto transition"
+			class="bg-base-100 flex flex-col w-full p-2 gap-2 border border-base-content/20 rounded overflow-x-auto transition"
 		>
-			<div class="bg-base-200 border border-base-content/20 flex flex-col gap-2 rounded m-2 p-1">
+			<div class="bg-base-200 flex flex-col gap-2 p-1 border border-base-content/20 rounded">
 				<input
 					class="input input-bordered"
 					type="text"
@@ -153,35 +67,31 @@
 				</div>
 			</div>
 
-			<ul class="flex gap-2 text-sm font-light m-2 ml-auto">
-				<li>
-					{data.transactions.length} transactions
-				</li>
-
-				<li>
-					{data.transactions
+			<div class="flex gap-2 p-1 text-sm font-light ml-auto">
+				<span>{data.transactions.length} transactions</span>
+				<span>
+					+ {data.transactions
 						.filter((t) => t.amount > 0)
 						.reduce((a, b) => a + b.amount, 0)
 						.toLocaleString('en-IN', {
 							style: 'currency',
 							currency: 'INR',
-							signDisplay: 'exceptZero'
+							signDisplay: 'never'
 						})}
-				</li>
-
-				<li>
-					{data.transactions
+				</span>
+				<span>
+					- {data.transactions
 						.filter((t) => t.amount < 0)
 						.reduce((a, b) => a + b.amount, 0)
 						.toLocaleString('en-IN', {
 							style: 'currency',
 							currency: 'INR',
-							signDisplay: 'exceptZero'
+							signDisplay: 'never'
 						})}
-				</li>
-			</ul>
+				</span>
+			</div>
 
-			<table class="table">
+			<table class="table rounded">
 				<thead class="sr-only">
 					<tr>
 						<th>Select</th>
@@ -195,12 +105,19 @@
 				<tbody>
 					{#each data.transactions as t}
 						<tr
-							class="hover"
-							on:click={() => (showDetailsId = showDetailsId === t.id ? 0 : t.id)}
+							class="hover rounded"
+							on:click={() => {
+								if (selectedTrIds.length)
+									selectedTrIds = selectedTrIds.includes(t.id)
+										? selectedTrIds.filter((i) => i !== t.id)
+										: [...selectedTrIds, t.id];
+								else showDetailsId = showDetailsId === t.id ? 0 : t.id;
+							}}
 							class:hidden={!t.merchant?.toLowerCase().includes(search.toLowerCase()) &&
 								!t.tag?.toLowerCase().includes(search.toLowerCase()) &&
 								!t.bank.toLowerCase().includes(search.toLowerCase()) &&
 								!t.notes?.toLowerCase().includes(search.toLowerCase())}
+							class:bg-base-200={showDetailsId === t.id}
 						>
 							<td>
 								<input
@@ -222,10 +139,11 @@
 								</p>
 							</td>
 							<td class="whitespace-nowrap text-lg font-semibold">
+								{t.amount > 0 ? '+' : '-'}
 								{t.amount.toLocaleString('en-IN', {
 									style: 'currency',
 									currency: 'INR',
-									signDisplay: 'exceptZero'
+									signDisplay: 'never'
 								})}
 							</td>
 							<td>
@@ -247,77 +165,179 @@
 			</table>
 		</div>
 
-		{#each data.transactions as t}
-			{#if t.id === showDetailsId}
-				<div
-					class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded sticky top-[52px] h-max"
-					in:fly={{ y: 32 }}
-				>
-					<div class="flex items-center justify-between gap-2">
-						<p class="font-semibold text-lg">
-							{t.amount.toLocaleString('en-IN', {
+		{#if selectedTrIds.length}
+			<div
+				class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded sticky top-[52px] h-max"
+				in:fly={{ y: 32 }}
+			>
+				<span class="badge badge-neutral badge-lg mx-auto">{selectedTrIds.length} selected</span>
+				<div class="flex gap-2 text-sm font-light mx-auto">
+					<span>
+						+ {data.transactions
+							.filter((t) => selectedTrIds.includes(t.id) && t.amount > 0)
+							.reduce((a, b) => a + b.amount, 0)
+							.toLocaleString('en-IN', {
 								style: 'currency',
 								currency: 'INR',
-								signDisplay: 'exceptZero'
+								signDisplay: 'never'
 							})}
-						</p>
-
-						<button class="btn btn-sm btn-square" on:click={() => (showDetailsId = 0)}>
-							<Icon icon="material-symbols:chevron-left-rounded" class="text-lg" />
-						</button>
-					</div>
-
-					<label class="form-control">
-						<div class="label">
-							<span class="label-text">Tags</span>
-						</div>
-
-						<select class="select select-bordered" bind:value={t.tag}>
-							{#each tags as tag}
-								<option>{tag}</option>
-							{/each}
-						</select>
-					</label>
-
-					<label class="form-control">
-						<div class="label">
-							<span class="label-text">Bank</span>
-						</div>
-						<select class="select select-bordered" bind:value={t.bank}>
-							{#each banks as bank}
-								<option>{bank}</option>
-							{/each}
-						</select>
-					</label>
-
-					<label class="form-control">
-						<div class="label">
-							<span class="label-text">Merchant/Payee/Payer</span>
-						</div>
-						<select class="select select-bordered" bind:value={t.merchant}>
-							{#each merchants as merchant}
-								<option>{merchant}</option>
-							{/each}
-						</select>
-					</label>
-
-					<label class="form-control">
-						<div class="label">
-							<span class="label-text">Notes</span>
-						</div>
-						<textarea
-							class="textarea textarea-bordered w-full"
-							placeholder="Notes"
-							bind:value={t.notes}
-						/>
-					</label>
-
-					<form action="?/delete" method="post" use:enhance>
-						<input type="hidden" name="id" value={t.id} />
-						<input class="btn btn-error w-full" type="submit" value="Delete" />
-					</form>
+					</span>
+					<span>
+						- {data.transactions
+							.filter((t) => selectedTrIds.includes(t.id) && t.amount < 0)
+							.reduce((a, b) => a + b.amount, 0)
+							.toLocaleString('en-IN', {
+								style: 'currency',
+								currency: 'INR',
+								signDisplay: 'never'
+							})}
+					</span>
 				</div>
-			{/if}
-		{/each}
+
+				<div class="dropdown w-full">
+					<div tabindex="0" role="button" class="btn btn-sm w-full justify-start">
+						<Icon icon="material-symbols:new-label-outline-rounded" />
+						Tag All
+					</div>
+					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+					<ul
+						tabindex="0"
+						class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+					>
+						{#each tags as t}
+							<li>
+								<button
+									on:click={() => {
+										data.transactions = data.transactions.map((tr) => {
+											if (selectedTrIds.includes(tr.id)) tr.tag = t;
+											return tr;
+										});
+									}}
+								>
+									{t}
+								</button>
+							</li>
+						{/each}
+					</ul>
+				</div>
+				<button class="btn btn-sm -mt-2 justify-start">
+					<Icon icon="material-symbols:label-off-outline-rounded" />
+					Remove Tag
+				</button>
+
+				<div class="dropdown w-full">
+					<div tabindex="0" role="button" class="btn btn-sm w-full justify-start">
+						<Icon icon="material-symbols:enterprise-outline" />
+						Edit Merchant
+					</div>
+					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+					<ul
+						tabindex="0"
+						class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+					>
+						{#each merchants as m}
+							<li>
+								<button
+									on:click={() => {
+										data.transactions = data.transactions.map((tr) => {
+											if (selectedTrIds.includes(tr.id)) tr.merchant = m;
+											return tr;
+										});
+									}}
+								>
+									{m}
+								</button>
+							</li>
+						{/each}
+					</ul>
+				</div>
+				<button class="btn btn-sm -mt-2 justify-start">
+					<Icon icon="material-symbols:enterprise-off-outline" />
+					Remove Merchant
+				</button>
+
+				<button
+					class="btn btn-sm hover:btn-error justify-start"
+					on:click={() => (selectedTrIds = [])}
+				>
+					<Icon icon="material-symbols:block" />
+					Deselect All
+				</button>
+			</div>
+		{:else}
+			{#each data.transactions.filter((t) => t.id === showDetailsId) as t}
+				{#key showDetailsId}
+					<div
+						class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded sticky top-[52px] h-max"
+						in:fly={{ y: 32 }}
+					>
+						<div class="flex items-center justify-between gap-2">
+							<p class="font-semibold text-2xl">
+								{t.amount > 0 ? '+' : '-'}
+								{t.amount.toLocaleString('en-IN', {
+									style: 'currency',
+									currency: 'INR',
+									signDisplay: 'never'
+								})}
+							</p>
+
+							<button class="btn btn-sm btn-square" on:click={() => (showDetailsId = 0)}>
+								<Icon icon="material-symbols:chevron-left-rounded" class="text-lg" />
+							</button>
+						</div>
+
+						<label class="form-control">
+							<div class="label">
+								<span class="label-text">Tags</span>
+							</div>
+
+							<select class="select select-bordered" value={t.tag}>
+								{#each tags as tag}
+									<option>{tag}</option>
+								{/each}
+							</select>
+						</label>
+
+						<label class="form-control">
+							<div class="label">
+								<span class="label-text">Bank</span>
+							</div>
+							<select class="select select-bordered" value={t.bank}>
+								{#each banks as bank}
+									<option>{bank}</option>
+								{/each}
+							</select>
+						</label>
+
+						<label class="form-control">
+							<div class="label">
+								<span class="label-text">Merchant/Payee/Payer</span>
+							</div>
+							<select class="select select-bordered" value={t.merchant}>
+								{#each merchants as merchant}
+									<option>{merchant}</option>
+								{/each}
+							</select>
+						</label>
+
+						<label class="form-control">
+							<div class="label">
+								<span class="label-text">Notes</span>
+							</div>
+							<textarea
+								class="textarea textarea-bordered w-full"
+								placeholder="Notes"
+								value={t.notes}
+							/>
+						</label>
+
+						<form action="?/delete" method="post" use:enhance>
+							<input type="hidden" name="id" value={t.id} />
+							<input class="btn btn-error w-full" type="submit" value="Delete" />
+						</form>
+					</div>
+				{/key}
+			{/each}
+		{/if}
 	</div>
 </div>
