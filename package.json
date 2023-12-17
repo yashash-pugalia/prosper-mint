@@ -38,6 +38,7 @@
 		"drizzle-kit": "^0.20.6",
 		"drizzle-orm": "^0.29.1",
 		"svelte-persisted-store": "^0.7.0",
+		"svelte-sonner": "^0.3.6",
 		"theme-change": "^2.5.0"
 	}
 }

@@ -1,46 +1,11 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
-
-	export let form;
-	export let data;
 
 	let loaded = false;
 
 	onMount(() => (loaded = true));
 </script>
-
-{#if form?.message}
-	<p>{form.message}</p>
-{/if}
-
-<form class="flex gap-0 mx-auto" action="?/add" method="post" use:enhance>
-	<input class="input input-bordered" type="text" name="content" placeholder="Content" />
-	<input class="btn btn-neutral" type="submit" value="Add" />
-</form>
-
-{#if data?.todos}
-	{#each data.todos as todo}
-		<div class="flex items-center gap-2 bg-base-100 border rounded">
-			<form action="/?/update" method="post" use:enhance>
-				<input type="hidden" name="id" value={todo.id} />
-				<input class="input" type="text" name="content" value={todo.content} />
-				<input class="checkbox" type="checkbox" name="completed" checked={todo.completed} />
-				<input class="btn" type="submit" value="Update" />
-			</form>
-
-			<form action="/?/delete" method="post" use:enhance>
-				<input type="hidden" name="id" value={todo.id} />
-				<input class="btn btn-error" type="submit" value="Delete" />
-			</form>
-
-			<p>
-				{todo.createdAt?.toLocaleString()}
-			</p>
-		</div>
-	{/each}
-{/if}
 
 <div class="mx-auto w-full">
 	<!-- just to get transition working -->

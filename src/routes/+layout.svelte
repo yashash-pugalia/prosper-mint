@@ -1,11 +1,14 @@
-<script>
+<script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
+	import { Toaster } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 	import 'tailwindcss/tailwind.css';
 	import { themeChange } from 'theme-change';
 
 	let showNav = true;
+
+	let theme: 'system' | 'dark' | 'light' = 'system';
 
 	onMount(() => {
 		window.addEventListener('resize', () => {
@@ -14,8 +17,13 @@
 		});
 
 		themeChange(false);
+
+		let tl = localStorage.getItem('theme') as '' | 'light' | 'dark' | null;
+		if (tl) theme = tl;
 	});
 </script>
+
+<Toaster {theme} />
 
 <div class="max-w-screen-xl p-4 w-full mx-auto min-h-screen">
 	<nav

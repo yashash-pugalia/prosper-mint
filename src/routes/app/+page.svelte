@@ -1,53 +1,36 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Icon from '@iconify/svelte';
+	import { toast } from 'svelte-sonner';
 	import { fly, slide } from 'svelte/transition';
-	import { banks, merchants, tags, transactions } from '../store';
+	import { banks, merchants, tags } from '../store';
 
-	let newAmount: number | undefined;
+	export let form;
+	export let data;
+
+	let selectedTrIds: number[] = [];
 	let search = '';
 	let showDetailsId = 0;
 	let filterTransactionType: 'income' | 'expense' | 'all' = 'all';
 
-	const addTransaction = () => {
-		if (!newAmount) {
-			// toast('Please enter an amount');
-			return;
-		}
-
-		$transactions = [
-			...$transactions,
-			{
-				id: $transactions.length + 1,
-				checked: false,
-				date: new Date().toISOString(),
-				type: newAmount < 0 ? 'expense' : 'income',
-				amount: Math.abs(newAmount),
-				merchant: merchants[Math.floor(Math.random() * merchants.length)],
-				tag: tags[Math.floor(Math.random() * tags.length)],
-				bank: banks[Math.floor(Math.random() * banks.length)],
-				notes: ''
-			}
-		];
-
-		newAmount = undefined;
-	};
+	$: if (form?.message) toast(form.message);
+	$: if (data.transactions) console.log('data.transactions', data.transactions);
+	$: console.log('selectedTrIds', selectedTrIds);
 </script>
 
 <div class="flex flex-col gap-2 py-4">
-	<div class="flex mx-auto">
+	<form class="flex mx-auto" action="?/add" method="post" use:enhance>
 		<input
 			class="input input-bordered rounded-r-none"
 			type="number"
+			step="0.01"
 			placeholder="Enter Amount"
-			bind:value={newAmount}
-			on:keypress={(e) => {
-				if (e.key === 'Enter') addTransaction();
-			}}
+			name="amount"
 		/>
-		<button on:click={addTransaction} class="btn btn-neutral rounded-l-none">Add</button>
-	</div>
+		<button class="btn btn-neutral rounded-l-none" type="submit">Add</button>
+	</form>
 
-	{#if $transactions.filter((t) => t.checked).length > 0}
+	{#if selectedTrIds.length}
 		<div
 			class="bg-base-100 flex items-center gap-2 p-2 rounded border border-base-content/20"
 			transition:slide
@@ -63,11 +46,8 @@
 						<li>
 							<button
 								on:click={() => {
-									$transactions = $transactions.map((tr) => {
-										if (tr.checked) {
-											tr.tag = t;
-											tr.checked = false;
-										}
+									data.transactions = data.transactions.map((tr) => {
+										if (selectedTrIds.includes(tr.id)) tr.tag = t;
 										return tr;
 									});
 								}}
@@ -90,11 +70,8 @@
 						<li>
 							<button
 								on:click={() => {
-									$transactions = $transactions.map((tr) => {
-										if (tr.checked) {
-											tr.merchant = m;
-											tr.checked = false;
-										}
+									data.transactions = data.transactions.map((tr) => {
+										if (selectedTrIds.includes(tr.id)) tr.merchant = m;
 										return tr;
 									});
 								}}
@@ -106,39 +83,33 @@
 				</ul>
 			</div>
 
-			<button
-				class="btn btn-sm hover:btn-error"
-				on:click={() => {
-					$transactions = $transactions.map((t) => {
-						t.checked = false;
-						return t;
-					});
-				}}
-			>
+			<button class="btn btn-sm hover:btn-error" on:click={() => (selectedTrIds = [])}>
 				Deselect All
 			</button>
 
 			<ul class="flex gap-2 text-sm font-light m-2 ml-auto">
 				<div class="badge badge-neutral">
-					{$transactions.filter((t) => t.checked).length} selected
+					{selectedTrIds.length} selected
 				</div>
 
 				<li>
-					+ {$transactions
-						.filter((t) => t.checked && t.type === 'income')
+					{data.transactions
+						.filter((t) => selectedTrIds.includes(t.id) && t.amount > 0)
 						.reduce((a, b) => a + b.amount, 0)
-						.toLocaleString(undefined, {
+						.toLocaleString('en-IN', {
 							style: 'currency',
-							currency: 'INR'
+							currency: 'INR',
+							signDisplay: 'exceptZero'
 						})}
 				</li>
 				<li>
-					- {$transactions
-						.filter((t) => t.checked && t.type === 'expense')
+					{data.transactions
+						.filter((t) => selectedTrIds.includes(t.id) && t.amount < 0)
 						.reduce((a, b) => a + b.amount, 0)
-						.toLocaleString(undefined, {
+						.toLocaleString('en-IN', {
 							style: 'currency',
-							currency: 'INR'
+							currency: 'INR',
+							signDisplay: 'exceptZero'
 						})}
 				</li>
 			</ul>
@@ -153,7 +124,7 @@
 				<input
 					class="input input-bordered"
 					type="text"
-					placeholder="Search Transactions..."
+					placeholder="Search transactions..."
 					bind:value={search}
 				/>
 
@@ -184,26 +155,28 @@
 
 			<ul class="flex gap-2 text-sm font-light m-2 ml-auto">
 				<li>
-					{$transactions.length} transactions
+					{data.transactions.length} transactions
 				</li>
 
 				<li>
-					+ {$transactions
-						.filter((t) => t.type === 'income')
+					{data.transactions
+						.filter((t) => t.amount > 0)
 						.reduce((a, b) => a + b.amount, 0)
-						.toLocaleString(undefined, {
+						.toLocaleString('en-IN', {
 							style: 'currency',
-							currency: 'INR'
+							currency: 'INR',
+							signDisplay: 'exceptZero'
 						})}
 				</li>
 
 				<li>
-					- {$transactions
-						.filter((t) => t.type === 'expense')
+					{data.transactions
+						.filter((t) => t.amount < 0)
 						.reduce((a, b) => a + b.amount, 0)
-						.toLocaleString(undefined, {
+						.toLocaleString('en-IN', {
 							style: 'currency',
-							currency: 'INR'
+							currency: 'INR',
+							signDisplay: 'exceptZero'
 						})}
 				</li>
 			</ul>
@@ -220,44 +193,40 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each $transactions as t}
+					{#each data.transactions as t}
 						<tr
 							class="hover"
 							on:click={() => (showDetailsId = showDetailsId === t.id ? 0 : t.id)}
-							class:hidden={(!t.merchant.toLowerCase().includes(search.toLowerCase()) &&
-								!t.tag.toLowerCase().includes(search.toLowerCase()) &&
+							class:hidden={!t.merchant?.toLowerCase().includes(search.toLowerCase()) &&
+								!t.tag?.toLowerCase().includes(search.toLowerCase()) &&
 								!t.bank.toLowerCase().includes(search.toLowerCase()) &&
-								!t.notes.toLowerCase().includes(search.toLowerCase())) ||
-								(filterTransactionType !== 'all' && t.type !== filterTransactionType)}
+								!t.notes?.toLowerCase().includes(search.toLowerCase())}
 						>
 							<td>
 								<input
 									type="checkbox"
 									class="checkbox"
-									bind:checked={t.checked}
+									bind:group={selectedTrIds}
+									value={t.id}
 									on:click|stopPropagation
 								/>
 							</td>
 							<td>
-								<p>
-									{new Date(t.date).toLocaleString('default', { month: 'short', day: 'numeric' })}
-								</p>
+								<p>{t.timestamp.toLocaleString('default', { month: 'short', day: 'numeric' })}</p>
 								<p class="text-sm font-light whitespace-nowrap">
-									{new Date(t.date).toLocaleString('default', {
+									{t.timestamp.toLocaleString('default', {
 										hour: 'numeric',
 										minute: 'numeric',
 										hour12: true
 									})}
 								</p>
 							</td>
-							<td class="whitespace-nowrap">
-								{t.type === 'income' ? '+' : '-'}
-								<span class="text-lg font-semibold">
-									{t.amount.toLocaleString(undefined, {
-										style: 'currency',
-										currency: 'INR'
-									})}
-								</span>
+							<td class="whitespace-nowrap text-lg font-semibold">
+								{t.amount.toLocaleString('en-IN', {
+									style: 'currency',
+									currency: 'INR',
+									signDisplay: 'exceptZero'
+								})}
 							</td>
 							<td>
 								<select class="select" bind:value={t.merchant} on:click|stopPropagation>
@@ -278,7 +247,7 @@
 			</table>
 		</div>
 
-		{#each $transactions as t}
+		{#each data.transactions as t}
 			{#if t.id === showDetailsId}
 				<div
 					class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded sticky top-[52px] h-max"
@@ -286,9 +255,10 @@
 				>
 					<div class="flex items-center justify-between gap-2">
 						<p class="font-semibold text-lg">
-							{t.amount.toLocaleString(undefined, {
+							{t.amount.toLocaleString('en-IN', {
 								style: 'currency',
-								currency: 'INR'
+								currency: 'INR',
+								signDisplay: 'exceptZero'
 							})}
 						</p>
 
@@ -296,16 +266,6 @@
 							<Icon icon="material-symbols:chevron-left-rounded" class="text-lg" />
 						</button>
 					</div>
-
-					<label class="form-control">
-						<div class="label">
-							<span class="label-text">Type</span>
-						</div>
-						<select class="select select-bordered" bind:value={t.type}>
-							<option>income</option>
-							<option>expense</option>
-						</select>
-					</label>
 
 					<label class="form-control">
 						<div class="label">
@@ -352,15 +312,10 @@
 						/>
 					</label>
 
-					<button
-						class="btn btn-error"
-						on:click={() => {
-							$transactions = $transactions.filter((tr) => tr.id !== t.id);
-							showDetailsId = 0;
-						}}
-					>
-						Delete
-					</button>
+					<form action="?/delete" method="post" use:enhance>
+						<input type="hidden" name="id" value={t.id} />
+						<input class="btn btn-error w-full" type="submit" value="Delete" />
+					</form>
 				</div>
 			{/if}
 		{/each}

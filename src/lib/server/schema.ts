@@ -1,8 +1,11 @@
-import { boolean, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { real, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
-export const todos = pgTable('todos', {
+export const transactionTable = pgTable('transactionTable', {
 	id: serial('id').primaryKey(),
-	content: text('title').notNull(),
-	completed: boolean('completed').notNull().default(false),
-	createdAt: timestamp('created_at').defaultNow()
+	amount: real('amount').notNull(),
+	bank: text('bank').notNull(),
+	timestamp: timestamp('timestamp').defaultNow().notNull(),
+	merchant: text('merchant'),
+	notes: text('notes'),
+	tag: text('tag')
 });
