@@ -15,15 +15,13 @@ export const actions = {
 		const formData = await request.formData();
 
 		const amount = Number(formData.get('amount'));
+		const merchant = merchants[Math.floor(Math.random() * merchants.length)];
+		const tag = tags[Math.floor(Math.random() * tags.length)];
+		const bank = banks[Math.floor(Math.random() * banks.length)];
 
 		if (!amount) return fail(400, { message: 'Amount  is required' });
 
-		await db.insert(transactionTable).values({
-			amount: amount,
-			merchant: merchants[Math.floor(Math.random() * merchants.length)],
-			tag: tags[Math.floor(Math.random() * tags.length)],
-			bank: banks[Math.floor(Math.random() * banks.length)]
-		});
+		await db.insert(transactionTable).values({ amount, merchant, tag, bank });
 
 		return { message: 'Transaction added successfully' };
 	},
@@ -32,17 +30,19 @@ export const actions = {
 		const formData = await request.formData();
 
 		const id = formData.get('id')?.toString();
+		// const amount = Number(formData.get('amount'));
+		const bank = formData.get('bank')?.toString();
+		// const timestamp = new Date(formData.get('timestamp') as string);
+		const merchant = formData.get('merchant')?.toString();
 		const notes = formData.get('notes')?.toString();
+		const tag = formData.get('tag')?.toString();
 
-		if (!notes || !id) return fail(400, { message: 'Error updating Transaction' });
+		if (!id) return fail(400, { message: 'Error updating Transaction' });
 
-		// await db
-		// 	.update(todos)
-		// 	.set({
-		// 		content,
-		// 		completed: !!completed
-		// 	})
-		// 	.where(eq(todos.id, +id));
+		await db
+			.update(transactionTable)
+			.set({ bank, merchant, notes, tag })
+			.where(eq(transactionTable.id, +id));
 
 		return { message: 'Todo updated successfully' };
 	},

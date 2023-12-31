@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import Icon from '@iconify/svelte';
 	import { toast } from 'svelte-sonner';
-	import { fly, slide } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { banks, merchants, tags } from '../store';
 
 	export let form;
@@ -14,8 +14,6 @@
 	let filterTransactionType: 'income' | 'expense' | 'all' = 'all';
 
 	$: if (form?.message) toast(form.message);
-	$: if (data.transactions) console.log('data.transactions', data.transactions);
-	$: console.log('selectedTrIds', selectedTrIds);
 </script>
 
 <div class="flex flex-col gap-2 py-4">
@@ -147,7 +145,7 @@
 								})}
 							</td>
 							<td>
-								<select class="select" bind:value={t.merchant} on:click|stopPropagation>
+								<select class="select" value={t.merchant} on:click|stopPropagation>
 									{#each merchants as merchant}
 										<option>{merchant}</option>
 									{/each}
@@ -165,6 +163,7 @@
 			</table>
 		</div>
 
+		<!-- Bulk Actions -->
 		{#if selectedTrIds.length}
 			<div
 				class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded sticky top-[52px] h-max"
@@ -267,10 +266,15 @@
 		{:else}
 			{#each data.transactions.filter((t) => t.id === showDetailsId) as t}
 				{#key showDetailsId}
-					<div
+					<form
 						class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded sticky top-[52px] h-max"
+						action="?/update"
+						method="post"
+						use:enhance
 						in:fly={{ y: 32 }}
 					>
+						<input type="hidden" name="id" value={t.id} />
+
 						<div class="flex items-center justify-between gap-2">
 							<p class="font-semibold text-2xl">
 								{t.amount > 0 ? '+' : '-'}
@@ -287,11 +291,8 @@
 						</div>
 
 						<label class="form-control">
-							<div class="label">
-								<span class="label-text">Tags</span>
-							</div>
-
-							<select class="select select-bordered" value={t.tag}>
+							<div class="label"><span class="label-text">Tags</span></div>
+							<select class="select select-bordered" name="tag" value={t.tag}>
 								{#each tags as tag}
 									<option>{tag}</option>
 								{/each}
@@ -299,10 +300,8 @@
 						</label>
 
 						<label class="form-control">
-							<div class="label">
-								<span class="label-text">Bank</span>
-							</div>
-							<select class="select select-bordered" value={t.bank}>
+							<div class="label"><span class="label-text">Bank</span></div>
+							<select class="select select-bordered" name="bank" value={t.bank}>
 								{#each banks as bank}
 									<option>{bank}</option>
 								{/each}
@@ -310,10 +309,8 @@
 						</label>
 
 						<label class="form-control">
-							<div class="label">
-								<span class="label-text">Merchant/Payee/Payer</span>
-							</div>
-							<select class="select select-bordered" value={t.merchant}>
+							<div class="label"><span class="label-text">Merchant/Payee/Payer</span></div>
+							<select class="select select-bordered" name="merchant" value={t.merchant}>
 								{#each merchants as merchant}
 									<option>{merchant}</option>
 								{/each}
@@ -321,21 +318,22 @@
 						</label>
 
 						<label class="form-control">
-							<div class="label">
-								<span class="label-text">Notes</span>
-							</div>
+							<div class="label"><span class="label-text">Notes</span></div>
 							<textarea
 								class="textarea textarea-bordered w-full"
 								placeholder="Notes"
+								name="notes"
 								value={t.notes}
 							/>
 						</label>
 
-						<form action="?/delete" method="post" use:enhance>
-							<input type="hidden" name="id" value={t.id} />
-							<input class="btn btn-error w-full" type="submit" value="Delete" />
-						</form>
-					</div>
+						<div class="flex gap-2">
+							<button class="btn btn-neutral grow" type="submit">Update</button>
+							<button class="btn btn-square btn-error" formaction="?/delete">
+								<Icon icon="material-symbols:delete-outline-rounded" />
+							</button>
+						</div>
+					</form>
 				{/key}
 			{/each}
 		{/if}
