@@ -1,8 +1,8 @@
-import db from '$lib/server/db';
-import { transactionTable } from '$lib/server/schema';
+import { db } from '$lib/server/db/index';
+import { transactionTable } from '$lib/server/db/schema';
 import { fail } from '@sveltejs/kit';
 import { desc, eq } from 'drizzle-orm';
-import { banks, merchants, tags } from '../store';
+import { banks, merchants, tags } from '../../store';
 
 export const load = async () => {
 	return {

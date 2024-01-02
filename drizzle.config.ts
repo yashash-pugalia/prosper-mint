@@ -1,12 +1,10 @@
 import type { Config } from 'drizzle-kit';
-import * as dotenv from 'dotenv';
-dotenv.config();
 
 export default {
-	schema: './src/lib/server/schema.ts',
+	schema: './src/lib/server/db/schema.ts',
 	out: './drizzle',
-	driver: 'pg',
+	driver: 'turso',
 	dbCredentials: {
-		connectionString: process.env.DRIZZLE_DATABASE_URL as string
+		url: 'file:./local.db'
 	}
 } satisfies Config;
