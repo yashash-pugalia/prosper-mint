@@ -20,6 +20,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.1",
 		"autoprefixer": "^10.4.16",
 		"daisyui": "^4.4.24",
+		"drizzle-kit": "^0.20.17",
 		"pg": "^8.11.3",
 		"postcss": "^8.4.32",
 		"prettier": "^3.1.1",
@@ -35,7 +36,6 @@
 	"dependencies": {
 		"@neondatabase/serverless": "^0.6.1",
 		"dotenv": "^16.3.1",
-		"drizzle-kit": "^0.20.9",
 		"drizzle-orm": "^0.29.2",
 		"svelte-persisted-store": "^0.7.0",
 		"svelte-sonner": "^0.3.9",
