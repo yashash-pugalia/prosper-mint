@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
 	import Icon from '@iconify/svelte';
+	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { fly } from 'svelte/transition';
-	import { banks, merchants, tags } from '../store';
+	import { merchants, tags } from '../store';
 
 	export let form;
 	export let data;
@@ -14,6 +16,13 @@
 	let filterTransactionType: 'income' | 'expense' | 'all' = 'all';
 
 	$: if (form?.message) toast(form.message);
+
+	onMount(() => {
+		if (!data.banks.length) {
+			toast('Please add a bank first');
+			goto('/banks');
+		}
+	});
 </script>
 
 <div class="flex flex-col gap-2 py-4">
@@ -25,7 +34,7 @@
 			placeholder="Enter Amount"
 			name="amount"
 		/>
-		<button class="btn btn-neutral rounded-l-none" type="submit">Add</button>
+		<button class="btn btn-primary rounded-l-none" type="submit">Add</button>
 	</form>
 
 	<div class="flex gap-2 w-full">
@@ -113,7 +122,10 @@
 							}}
 							class:hidden={!t.merchant?.toLowerCase().includes(search.toLowerCase()) &&
 								!t.tag?.toLowerCase().includes(search.toLowerCase()) &&
-								!t.bank.toLowerCase().includes(search.toLowerCase()) &&
+								!data.banks
+									.find((b) => b.id === t.bank_id)
+									?.name.toLowerCase()
+									.includes(search.toLowerCase()) &&
 								!t.notes?.toLowerCase().includes(search.toLowerCase())}
 							class:bg-base-200={showDetailsId === t.id}
 						>
@@ -155,7 +167,11 @@
 								<div class="badge badge-ghost">{t.tag}</div>
 							</td>
 							<td>
-								<img class="w-8 h-8" src="/bank-logos/{t.bank.toLowerCase()}.png" alt="" />
+								<img
+									class="w-8 h-8"
+									src="/bank-logos/{data.banks.find((b) => b.id === t.bank_id)?.name}.png"
+									alt=""
+								/>
 							</td>
 						</tr>
 					{/each}
@@ -301,9 +317,9 @@
 
 						<label class="form-control">
 							<div class="label"><span class="label-text">Bank</span></div>
-							<select class="select select-bordered" name="bank" value={t.bank}>
-								{#each banks as bank}
-									<option>{bank}</option>
+							<select class="select select-bordered" name="bank_id" value={t.bank_id}>
+								{#each data.banks as bank}
+									<option value={bank.id}>{bank.name}</option>
 								{/each}
 							</select>
 						</label>
@@ -328,7 +344,7 @@
 						</label>
 
 						<div class="flex gap-2">
-							<button class="btn btn-neutral grow" type="submit">Update</button>
+							<button class="btn btn-primary grow" type="submit">Update</button>
 							<button class="btn btn-square btn-error" formaction="?/delete">
 								<Icon icon="material-symbols:delete-outline-rounded" />
 							</button>

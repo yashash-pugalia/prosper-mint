@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 	import { Toaster } from 'svelte-sonner';
@@ -27,7 +28,7 @@
 
 <div class="max-w-screen-xl p-4 w-full mx-auto min-h-screen">
 	<nav
-		class="border-b border-base-content/20 -mx-4 -mt-4 py-2 px-4 flex flex-wrap justify-between items-center sticky top-0 z-50 bg-base-200"
+		class="border-b border-base-content/20 -mx-4 -mt-4 py-2 px-4 flex flex-wrap justify-between items-center sticky top-0 z-50 bg-base-300"
 	>
 		<a class="text-lg font-semibold" href="/">Prosper Mint</a>
 
@@ -36,11 +37,27 @@
 		</button>
 
 		{#if showNav}
-			<div class="flex gap-4 flex-col w-full sm:w-auto sm:flex-row" transition:slide>
-				<a href="/signup" class="link link-hover">Sign Up</a>
-				<a href="/app" class="link link-hover">App</a>
-				<a href="/" class="link link-hover">Blog</a>
-				<a href="/" class="link link-hover">Privacy</a>
+			<div class="flex rounded gap-2 flex-col w-full sm:w-auto sm:flex-row" transition:slide>
+				<a href="/signup" class="btn btn-sm" class:btn-active={$page.route.id === '/signup'}>
+					<Icon icon="material-symbols:login-rounded" />
+					Sign Up
+				</a>
+				<a href="/portfolio" class="btn btn-sm" class:btn-active={$page.route.id === '/portfolio'}>
+					<Icon icon="material-symbols:monitoring-rounded" />
+					Portfolio
+				</a>
+				<a
+					href="/transactions"
+					class="btn btn-sm"
+					class:btn-active={$page.route.id === '/transactions'}
+				>
+					<Icon icon="material-symbols:featured-play-list-outline-rounded" />
+					Transactions
+				</a>
+				<a href="/banks" class="btn btn-sm" class:btn-active={$page.route.id === '/banks'}>
+					<Icon icon="material-symbols:account-balance-outline-rounded" />
+					Banks
+				</a>
 			</div>
 		{/if}
 	</nav>

@@ -22,7 +22,7 @@
 
 			<h2 class="text-2xl sm:text-4xl lg:text-5xl font-semibold">Get in charge of your money.</h2>
 
-			<a class="btn btn-neutral mt-2" href="/signup">Get Started</a>
+			<a class="btn btn-primary mt-2" href="/signup">Get Started</a>
 
 			<p class="text-lg mt-8 text-center">
 				Get a clear picture of your finances. So you can make better decisions and lead a healthier

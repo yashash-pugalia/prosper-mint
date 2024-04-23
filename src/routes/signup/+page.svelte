@@ -7,13 +7,14 @@
 		<div class="text-center lg:text-left">
 			<h1 class="text-5xl font-bold">Login now!</h1>
 			<p class="py-6">
-				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quis, dolor corporis distinctio
-				consequatur fuga cumque ullam rerum. Natus nisi necessitatibus, dolorum minima labore
-				expedita minus libero. Non odit nisi deleniti.
+				Seamlessly monitor your financial world with Prosper Mint, a dynamic personal finance
+				tracking marvel. It transforms chaos into clarity, effortlessly handling expenses,
+				investments, and cash flow. Unlock insights into your financial well-being and embark on a
+				journey of smart financial habits.
 			</p>
 		</div>
 		<div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-			<form class="card-body" on:submit|preventDefault={() => goto('/app')}>
+			<form class="card-body" on:submit|preventDefault={() => goto('/transactions')}>
 				<div class="form-control">
 					<label class="label" for="">
 						<span class="label-text">Email</span>
@@ -29,7 +30,7 @@
 						<a href="/#" class="label-text-alt link link-hover">Forgot password?</a>
 					</label>
 				</div>
-				<div class="form-control mt-6">
+				<div class="form-control mt-4">
 					<button class="btn btn-primary">Login</button>
 				</div>
 			</form>
