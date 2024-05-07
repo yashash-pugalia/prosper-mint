@@ -1,9 +1,10 @@
-import { DRIZZLE_DATABASE_URL } from '$env/static/private';
-import { neon, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { sql } from '@vercel/postgres';
+import * as dotenv from 'dotenv';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
+import * as schema from './schema';
 
-neonConfig.fetchConnectionCache = true;
-const sql = neon(DRIZZLE_DATABASE_URL!);
-const db = drizzle(sql);
+dotenv.config();
+
+export const db = drizzle(sql, { schema });
 
 export default db;
