@@ -123,7 +123,7 @@
 							class:hidden={!t.merchant?.toLowerCase().includes(search.toLowerCase()) &&
 								!t.tag?.toLowerCase().includes(search.toLowerCase()) &&
 								!data.banks
-									.find((b) => b.id === t.bank_id)
+									.find((b) => b.id === t.bankId)
 									?.name.toLowerCase()
 									.includes(search.toLowerCase()) &&
 								!t.notes?.toLowerCase().includes(search.toLowerCase())}
@@ -139,9 +139,9 @@
 								/>
 							</td>
 							<td>
-								<p>{t.timestamp.toLocaleString('default', { month: 'short', day: 'numeric' })}</p>
+								<p>{t.createdAt.toLocaleString('default', { month: 'short', day: 'numeric' })}</p>
 								<p class="text-sm font-light whitespace-nowrap">
-									{t.timestamp.toLocaleString('default', {
+									{t.createdAt.toLocaleString('default', {
 										hour: 'numeric',
 										minute: 'numeric',
 										hour12: true
@@ -169,7 +169,7 @@
 							<td>
 								<img
 									class="w-8 h-8"
-									src="/bank-logos/{data.banks.find((b) => b.id === t.bank_id)?.name}.png"
+									src="/bank-logos/{data.banks.find((b) => b.id === t.bankId)?.name}.png"
 									alt=""
 								/>
 							</td>
@@ -317,7 +317,7 @@
 
 						<label class="form-control">
 							<div class="label"><span class="label-text">Bank</span></div>
-							<select class="select select-bordered" name="bank_id" value={t.bank_id}>
+							<select class="select select-bordered" name="bankId" value={t.bankId}>
 								{#each data.banks as bank}
 									<option value={bank.id}>{bank.name}</option>
 								{/each}

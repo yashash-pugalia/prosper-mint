@@ -1,4 +1,4 @@
-import db from '$lib/server/db';
+import { db } from '$lib/server/db';
 import { bankTable } from '$lib/server/schema';
 import { fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
@@ -9,9 +9,10 @@ export const load = async () => {
 };
 
 export const actions = {
-	add: async ({ request }) => {
+	add: async ({ request, locals }) => {
 		const formData = await request.formData();
 
+		const userId = locals.user?.id!;
 		const name = formData.get('name')?.toString().toUpperCase();
 		const accountNo = Number(formData.get('accountNo'));
 		const swift = formData.get('swift')?.toString().toUpperCase();
@@ -21,7 +22,7 @@ export const actions = {
 		if (!name || !accountNo) return fail(400, { message: 'Name and Account No are required' });
 
 		try {
-			await db.insert(bankTable).values({ name, accountNo, swift, ifsc });
+			await db.insert(bankTable).values({ userId, name, accountNo, swift, ifsc });
 			return { message: 'Bank added successfully' };
 		} catch (e) {
 			return fail(500, { message: `Error adding Bank: ${e}` });

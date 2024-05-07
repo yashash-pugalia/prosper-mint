@@ -6,5 +6,3 @@ import * as schema from './schema';
 dotenv.config();
 
 export const db = drizzle(sql, { schema });
-
-export default db;
