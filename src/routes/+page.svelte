@@ -11,7 +11,7 @@
 	<!-- just to get transition working -->
 	{#if loaded}
 		<section
-			class="flex flex-col gap-4 items-center min-h-[calc(100vh-50px)] border-b border-base-content/20"
+			class="flex flex-col gap-4 items-center min-h-[calc(100vh-50px)] border-b"
 			transition:slide
 		>
 			<h1
@@ -22,16 +22,14 @@
 
 			<h2 class="text-2xl sm:text-4xl lg:text-5xl font-semibold">Get in charge of your money.</h2>
 
-			<a class="btn btn-primary mt-2" href="/signup">Get Started</a>
+			<a class="btn btn-primary mt-2" href="/login">Get Started</a>
 
 			<p class="text-lg mt-8 text-center">
 				Get a clear picture of your finances. So you can make better decisions and lead a healthier
 				financial life.
 			</p>
 
-			<div
-				class="flex border border-base-content/20 gap-2 p-2 rounded items-center mt-2 bg-base-100"
-			>
+			<div class="flex border gap-2 p-2 rounded items-center mt-2 bg-base-100">
 				<div class="p-4">
 					<p class="text-lg font-medium">Download the app</p>
 					<p class="text-slate-500">Currently in invite only Beta</p>

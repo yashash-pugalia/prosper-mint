@@ -39,9 +39,9 @@
 
 	<div class="flex gap-2 w-full">
 		<div
-			class="bg-base-100 flex flex-col w-full p-2 gap-2 border border-base-content/20 rounded overflow-x-auto transition"
+			class="bg-base-100 flex flex-col w-full p-2 gap-2 border rounded overflow-x-auto transition"
 		>
-			<div class="bg-base-200 flex flex-col gap-2 p-1 border border-base-content/20 rounded">
+			<div class="bg-base-200 flex flex-col gap-2 p-1 border rounded">
 				<input
 					class="input input-bordered"
 					type="text"
@@ -49,7 +49,7 @@
 					bind:value={search}
 				/>
 
-				<div class="bg-base-100 tabs tabs-boxed mr-auto border border-base-content/20">
+				<div class="bg-base-100 tabs tabs-boxed mr-auto border">
 					<button
 						class="tab"
 						class:tab-active={filterTransactionType === 'all'}
@@ -182,7 +182,7 @@
 		<!-- Bulk Actions -->
 		{#if selectedTrIds.length}
 			<div
-				class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded sticky top-[52px] h-max"
+				class="bg-base-100 flex flex-col gap-2 w-96 p-4 border rounded sticky top-[52px] h-max"
 				in:fly={{ y: 32 }}
 			>
 				<span class="badge badge-neutral badge-lg mx-auto">{selectedTrIds.length} selected</span>
@@ -283,7 +283,7 @@
 			{#each data.transactions.filter((t) => t.id === showDetailsId) as t}
 				{#key showDetailsId}
 					<form
-						class="bg-base-100 flex flex-col gap-2 w-96 p-4 border border-base-content/20 rounded sticky top-[52px] h-max"
+						class="bg-base-100 flex flex-col gap-2 w-96 p-4 border rounded sticky top-[52px] h-max"
 						action="?/update"
 						method="post"
 						use:enhance

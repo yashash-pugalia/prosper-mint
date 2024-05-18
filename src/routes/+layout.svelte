@@ -6,10 +6,25 @@
 	import { slide } from 'svelte/transition';
 	import 'tailwindcss/tailwind.css';
 	import { themeChange } from 'theme-change';
+	import './app.pcss';
+	import { onNavigate } from '$app/navigation';
+
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
 
 	let showNav = true;
 
 	let theme: 'system' | 'dark' | 'light' = 'system';
+
+	export let data;
 
 	onMount(() => {
 		window.addEventListener('resize', () => {
@@ -28,7 +43,7 @@
 
 <div class="max-w-screen-xl p-4 w-full mx-auto min-h-screen">
 	<nav
-		class="border-b border-base-content/20 -mx-4 -mt-4 py-2 px-4 flex flex-wrap justify-between items-center sticky top-0 z-50 bg-base-300"
+		class="border-b -mx-4 -mt-4 py-2 px-4 flex flex-wrap justify-between items-center sticky top-0 z-50 bg-base-300"
 	>
 		<a class="text-lg font-semibold" href="/">Prosper Mint</a>
 
@@ -38,35 +53,40 @@
 
 		{#if showNav}
 			<div class="flex rounded gap-2 flex-col w-full sm:w-auto sm:flex-row" transition:slide>
-				<a href="/signup" class="btn btn-sm" class:btn-active={$page.route.id === '/signup'}>
-					<Icon icon="material-symbols:login-rounded" />
-					Sign Up
-				</a>
-				<a href="/portfolio" class="btn btn-sm" class:btn-active={$page.route.id === '/portfolio'}>
-					<Icon icon="material-symbols:monitoring-rounded" />
-					Portfolio
-				</a>
-				<a
-					href="/transactions"
-					class="btn btn-sm"
-					class:btn-active={$page.route.id === '/transactions'}
-				>
-					<Icon icon="material-symbols:featured-play-list-outline-rounded" />
-					Transactions
-				</a>
-				<a href="/banks" class="btn btn-sm" class:btn-active={$page.route.id === '/banks'}>
-					<Icon icon="material-symbols:account-balance-outline-rounded" />
-					Banks
-				</a>
+				{#if data.user}
+					<a
+						href="/portfolio"
+						class="btn btn-sm"
+						class:btn-active={$page.route.id === '/portfolio'}
+					>
+						<Icon icon="material-symbols:monitoring-rounded" />
+						Portfolio
+					</a>
+					<a
+						href="/transactions"
+						class="btn btn-sm"
+						class:btn-active={$page.route.id === '/transactions'}
+					>
+						<Icon icon="material-symbols:featured-play-list-outline-rounded" />
+						Transactions
+					</a>
+					<a href="/banks" class="btn btn-sm" class:btn-active={$page.route.id === '/banks'}>
+						<Icon icon="material-symbols:account-balance-outline-rounded" />
+						Banks
+					</a>
+				{:else}
+					<a href="/login" class="btn btn-sm" class:btn-active={$page.route.id === '/login'}>
+						<Icon icon="material-symbols:login-rounded" />
+						Sign Up
+					</a>
+				{/if}
 			</div>
 		{/if}
 	</nav>
 
 	<slot />
 
-	<footer
-		class="bg-base-200 flex -mx-4 -mb-4 px-4 p-1 gap-2 border-t border-base-content/20 sticky top-full"
-	>
+	<footer class="bg-base-200 flex -mx-4 -mb-4 px-4 p-1 gap-2 border-t sticky top-full">
 		{#each [{ icon: 'mdi:twitter', href: 'https://twitter.com/yashash_pugalia' }, { icon: 'mdi:github', href: 'https://github.com/yashash-pugalia' }, { icon: 'mdi:linkedin', href: 'https://www.linkedin.com/in/yashash-pugalia/' }] as e}
 			<a class="btn btn-sm btn-square btn-ghost" href={e.href}>
 				<Icon icon={e.icon} class="text-xl" />
@@ -94,11 +114,3 @@
 		</div>
 	</footer>
 </div>
-
-<style>
-	:global(body) {
-		background-color: oklch(var(--b2));
-		background-image: radial-gradient(oklch(var(--bc) / 20%) 5%, transparent 0);
-		background-size: 48px 48px;
-	}
-</style>

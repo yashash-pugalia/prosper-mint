@@ -3,18 +3,13 @@ import { bankTable } from '$lib/server/schema';
 import { fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
-export const load = async () => {
-	const banks = await db.select().from(bankTable);
-	return { banks };
-};
-
 export const actions = {
 	add: async ({ request, locals }) => {
 		const formData = await request.formData();
 
 		const userId = locals.user?.id!;
 		const name = formData.get('name')?.toString().toUpperCase();
-		const accountNo = Number(formData.get('accountNo'));
+		const accountNo = formData.get('accountNo')?.toString().toUpperCase();
 		const swift = formData.get('swift')?.toString().toUpperCase();
 		const ifsc = formData.get('ifsc')?.toString().toUpperCase();
 		// current user as holder name in future
@@ -35,9 +30,11 @@ export const actions = {
 
 		const id = Number(formData.get('id'));
 		const name = formData.get('name')?.toString().toUpperCase();
-		const accountNo = Number(formData.get('accountNo'));
+		const accountNo = formData.get('accountNo')?.toString().toUpperCase();
 		const swift = formData.get('swift')?.toString().toUpperCase();
 		const ifsc = formData.get('ifsc')?.toString().toUpperCase();
+
+		// TODO: user must own the bank account 		where(eq(bankTable.userId, event.locals.user.id))
 
 		try {
 			await db.update(bankTable).set({ name, accountNo, swift, ifsc }).where(eq(bankTable.id, id));
@@ -51,6 +48,8 @@ export const actions = {
 		const formData = await request.formData();
 		const id = Number(formData.get('id'));
 		if (!id) return fail(400, { message: 'Bank id is required.' });
+
+		// TODO: user must own the bank account 		where(eq(bankTable.userId, event.locals.user.id))
 
 		try {
 			await db.delete(bankTable).where(eq(bankTable.id, id));

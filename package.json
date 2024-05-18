@@ -36,6 +36,7 @@
 	"dependencies": {
 		"@lucia-auth/adapter-drizzle": "^1.0.7",
 		"@vercel/postgres": "^0.8.0",
+		"arctic": "^1.8.1",
 		"dotenv": "^16.4.5",
 		"drizzle-orm": "^0.29.5",
 		"svelte-persisted-store": "^0.7.0",

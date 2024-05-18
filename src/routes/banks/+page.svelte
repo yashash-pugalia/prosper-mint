@@ -19,8 +19,8 @@
 <!-- uneven width of cards to be improved -->
 <div class="flex flex-wrap gap-4 py-4">
 	{#each data.banks as bank}
-		<div class="bg-base-100 rounded border border-base-content/20 grow">
-			<div class="flex gap-2 items-center border-b px-4 py-2 border-base-content/20">
+		<div class="bg-base-100 rounded border grow">
+			<div class="flex gap-2 items-center border-b px-4 py-2">
 				<img class="w-8 h-8" src="/bank-logos/{bank.name}.png" alt="" />
 				<span class="font-semibold">
 					{bank.name}

@@ -1,28 +1,24 @@
 import { db } from '$lib/server/db';
 import { bankTable, transactionTable } from '$lib/server/schema';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { desc, eq } from 'drizzle-orm';
 import { merchants, tags } from '../store';
 
-export const load = async () => {
-	const transactions = await db
-		.select()
-		.from(transactionTable)
-		.orderBy(desc(transactionTable.createdAt));
-	const banks = await db.select().from(bankTable);
-
-	if (!banks.length) {
-		return redirect(303, '/banks');
-		// also add a toast
-	}
-
-	return { transactions, banks };
+export const load = async (event) => {
+	return {
+		transactions: await db
+			.select()
+			.from(transactionTable)
+			.orderBy(desc(transactionTable.createdAt))
+			.where(eq(transactionTable.userId, event.locals.user?.id!))
+	};
 };
 
 export const actions = {
-	add: async ({ request }) => {
+	add: async ({ request, locals }) => {
 		const formData = await request.formData();
 
+		const userId = locals.user?.id!;
 		const amount = Number(formData.get('amount'));
 		const merchant = merchants[Math.floor(Math.random() * merchants.length)];
 		const tag = tags[Math.floor(Math.random() * tags.length)];
@@ -34,7 +30,7 @@ export const actions = {
 		if (!amount) return fail(400, { message: 'Amount  is required' });
 
 		try {
-			await db.insert(transactionTable).values({ amount, merchant, tag, bankId });
+			await db.insert(transactionTable).values({ amount, merchant, tag, bankId, userId });
 			return { message: 'Transaction added successfully' };
 		} catch (e) {
 			return fail(500, { message: `Error adding Transaction: ${e}` });
@@ -54,6 +50,8 @@ export const actions = {
 
 		if (!id) return fail(400, { message: 'Transaction ID is required.' });
 
+		// TODO: user must own the transaction account 		where(eq(transactionTable.userId, event.locals.user.id))
+
 		try {
 			await db
 				.update(transactionTable)
@@ -70,6 +68,8 @@ export const actions = {
 
 		const id = Number(formData.get('id'));
 		if (!id) return fail(400, { message: 'Transaction ID is required.' });
+
+		// TODO: user must own the transaction account 		where(eq(transactionTable.userId, event.locals.user.id))
 
 		try {
 			await db.delete(transactionTable).where(eq(transactionTable.id, id));
