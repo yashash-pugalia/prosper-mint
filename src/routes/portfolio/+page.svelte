@@ -2,7 +2,7 @@
 	export let data;
 </script>
 
-<h1 class="text-3xl font-mono">
+<h1 class="text-3xl font-mono my-4">
 	Hi {data.user?.username}
 </h1>
 

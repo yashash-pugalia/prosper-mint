@@ -111,6 +111,15 @@
 			<button class="btn btn-sm btn-circle btn-ghost" data-set-theme="" data-act-class="btn-active">
 				<Icon icon="material-symbols:desktop-windows-outline-rounded" class="text-lg" />
 			</button>
+
+			<button class="btn-active hidden">so svelte doesn't remove btn-active css</button>
 		</div>
 	</footer>
 </div>
+
+<style lang="postcss">
+	/* looks cool just the buttom moving around */
+	nav a.btn-active {
+		view-transition-name: active-page;
+	}
+</style>
