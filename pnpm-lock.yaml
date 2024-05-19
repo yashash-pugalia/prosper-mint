@@ -70,6 +70,9 @@ devDependencies:
   svelte-check:
     specifier: ^3.7.1
     version: 3.7.1(postcss@8.4.38)(svelte@4.2.17)
+  sveltekit-search-params:
+    specifier: ^2.1.2
+    version: 2.1.2(@sveltejs/kit@2.5.9)(svelte@4.2.17)(vite@5.2.11)
   tailwindcss:
     specifier: ^3.4.3
     version: 3.4.3
@@ -2916,6 +2919,20 @@ packages:
       locate-character: 3.0.0
       magic-string: 0.30.10
       periscopic: 3.1.0
+
+  /sveltekit-search-params@2.1.2(@sveltejs/kit@2.5.9)(svelte@4.2.17)(vite@5.2.11):
+    resolution: {integrity: sha512-wh5WSo46wz48MdWvpchVGrOjoDmbmsNJ7dUToSZ4L1SQ2LOasmTjAAlFhfG/EFvEhR34phRzLF7BjE0ZHzx1Uw==}
+    peerDependencies:
+      '@sveltejs/kit': ^1.0.0 || ^2.0.0
+      svelte: ^3.55.0 || ^4.0.0 || ^5.0.0
+    dependencies:
+      '@sveltejs/kit': 2.5.9(@sveltejs/vite-plugin-svelte@3.1.0)(svelte@4.2.17)(vite@5.2.11)
+      '@sveltejs/vite-plugin-svelte': 3.1.0(svelte@4.2.17)(vite@5.2.11)
+      svelte: 4.2.17
+    transitivePeerDependencies:
+      - supports-color
+      - vite
+    dev: true
 
   /tailwindcss@3.4.3:
     resolution: {integrity: sha512-U7sxQk/n397Bmx4JHbJx/iSOOv5G+II3f1kpLpY2QeUv5DcPdcTsYLlusZfq1NthHS1c1cZoyFmmkex1rzke0A==}

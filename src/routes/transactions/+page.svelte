@@ -5,15 +5,18 @@
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { fly } from 'svelte/transition';
+	import { queryParam, ssp } from 'sveltekit-search-params';
 	import { merchants, tags } from '../store';
 
 	export let form;
 	export let data;
 
 	let selectedTrIds: number[] = [];
-	let search = '';
 	let showDetailsId = 0;
-	let filterTransactionType: 'income' | 'expense' | 'all' = 'all';
+	let search = '';
+
+	const filterTransactionType = queryParam('filterTransactionType', ssp.string('all')); // 'income' | 'expense' | 'all'
+	const sortBy = queryParam('sortBy', ssp.string('desc')); // 'asc' | 'desc'
 
 	$: if (form?.message) toast(form.message);
 
@@ -43,34 +46,32 @@
 		>
 			<div class="bg-base-200 flex flex-col gap-2 p-1 border rounded">
 				<input
-					class="input input-bordered"
+					class="input input-bordered w-full"
 					type="text"
 					placeholder="Search transactions..."
 					bind:value={search}
 				/>
 
-				<div class="bg-base-100 tabs tabs-boxed mr-auto border">
-					<button
-						class="tab"
-						class:tab-active={filterTransactionType === 'all'}
-						on:click={() => (filterTransactionType = 'all')}
-					>
-						All
-					</button>
-					<button
-						class="tab"
-						class:tab-active={filterTransactionType === 'income'}
-						on:click={() => (filterTransactionType = 'income')}
-					>
-						Income
-					</button>
-					<button
-						class="tab"
-						class:tab-active={filterTransactionType === 'expense'}
-						on:click={() => (filterTransactionType = 'expense')}
-					>
-						Expense
-					</button>
+				<div class="flex gap-2 items-center">
+					<select class="select select-sm select-bordered" bind:value={$sortBy}>
+						{#each [{ label: 'Newest First', value: 'desc' }, { label: 'Oldest First', value: 'asc' }] as { label, value }, i}
+							<option {value}>{label}</option>
+						{/each}
+					</select>
+
+					<div class="join border bg-base-100">
+						{#each [{ icon: 'material-symbols:arrow-circle-down-outline-rounded', type: 'income', tooltip: 'Income' }, { icon: 'material-symbols:arrow-circle-up-outline-rounded', type: 'expense', tooltip: 'Expense' }] as tab}
+							<button
+								class="btn btn-sm join-item tooltip btn-ghost"
+								class:btn-active={$filterTransactionType === tab.type}
+								data-tip={tab.tooltip}
+								on:click={() =>
+									($filterTransactionType = $filterTransactionType === tab.type ? 'all' : tab.type)}
+							>
+								<Icon icon={tab.icon} class="text-xl" />
+							</button>
+						{/each}
+					</div>
 				</div>
 			</div>
 
@@ -110,7 +111,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each data.transactions as t}
+					{#each data.transactions as t (t.id)}
 						<tr
 							class="hover rounded"
 							on:click={() => {

@@ -1,16 +1,27 @@
 import { db } from '$lib/server/db';
 import { bankTable, transactionTable } from '$lib/server/schema';
 import { fail } from '@sveltejs/kit';
-import { desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
 import { merchants, tags } from '../store';
 
-export const load = async (event) => {
+export const load = async ({ locals, url }) => {
+	const sortBy = url.searchParams.get('sortBy'); // asc or desc
+	const filterTransactionType = url.searchParams.get('filterTransactionType'); // income expense or all
+	const search = url.searchParams.get('search'); // search by merchant or tag or notes or bank name
+
 	return {
-		transactions: await db
-			.select()
-			.from(transactionTable)
-			.orderBy(desc(transactionTable.createdAt))
-			.where(eq(transactionTable.userId, event.locals.user?.id!))
+		transactions: await db.query.transactionTable.findMany({
+			where: and(
+				eq(transactionTable.userId, locals.user?.id!),
+				filterTransactionType === 'income'
+					? gt(transactionTable.amount, 0)
+					: filterTransactionType === 'expense'
+						? lt(transactionTable.amount, 0)
+						: undefined
+			),
+			orderBy: sortBy === 'asc' ? asc(transactionTable.createdAt) : desc(transactionTable.createdAt)
+		})
+		// sql`to_tsvector('simple', ${transactionTable.merchant}) @@ to_tsquery('simple', ${search})`
 	};
 };
 

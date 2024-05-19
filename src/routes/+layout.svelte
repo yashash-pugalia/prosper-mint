@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
@@ -7,7 +8,23 @@
 	import 'tailwindcss/tailwind.css';
 	import { themeChange } from 'theme-change';
 	import './app.pcss';
-	import { onNavigate } from '$app/navigation';
+
+	export let data;
+
+	let showNav = true;
+
+	let theme: 'system' | 'dark' | 'light' = 'system';
+
+	onMount(() => {
+		window.addEventListener('resize', () => {
+			if (window.innerWidth > 640) showNav = true;
+			else showNav = false;
+		});
+
+		themeChange(false);
+		let tl = localStorage.getItem('theme') as '' | 'light' | 'dark' | null;
+		if (tl) theme = tl;
+	});
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
@@ -18,24 +35,6 @@
 				await navigation.complete;
 			});
 		});
-	});
-
-	let showNav = true;
-
-	let theme: 'system' | 'dark' | 'light' = 'system';
-
-	export let data;
-
-	onMount(() => {
-		window.addEventListener('resize', () => {
-			if (window.innerWidth > 640) showNav = true;
-			else showNav = false;
-		});
-
-		themeChange(false);
-
-		let tl = localStorage.getItem('theme') as '' | 'light' | 'dark' | null;
-		if (tl) theme = tl;
 	});
 </script>
 

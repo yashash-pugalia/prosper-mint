@@ -5,7 +5,9 @@ import { desc, eq } from 'drizzle-orm';
 
 export const load = async (event) => {
 	if (!event.locals.user) {
-		// TODO: is this the best way to handle this?
+		// TODO: not the best way to handle this.
+		// https://kit.svelte.dev/docs/load#implications-for-authentication move to hooks
+
 		const unprotectedRoutes = ['/', '/login'];
 
 		if (unprotectedRoutes.includes(event.route.id!))
