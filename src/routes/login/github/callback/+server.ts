@@ -1,8 +1,8 @@
 import { github, lucia } from '$lib/server/auth';
 import { db } from '$lib/server/db';
-import { userTable } from '$lib/server/schema';
+import { oauthAccountTable, userTable } from '$lib/server/schema';
 import { OAuth2RequestError } from 'arctic';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import type { RequestEvent } from '@sveltejs/kit';
 
@@ -26,27 +26,32 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 		const githubUser: GitHubUser = await githubUserResponse.json();
 
-		const existingUser = await db.query.userTable.findFirst({
-			where: eq(userTable.githubId, githubUser.id)
+		const existingAccount = await db.query.oauthAccountTable.findFirst({
+			where: and(
+				eq(oauthAccountTable.providerId, 'github'),
+				eq(oauthAccountTable.providerUserId, githubUser.id.toString())
+			)
 		});
 
-		if (existingUser) {
-			const session = await lucia.createSession(existingUser.id, {});
+		if (existingAccount) {
+			const session = await lucia.createSession(existingAccount.userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
 				...sessionCookie.attributes
 			});
 		} else {
-			const user = await db
+			const [user] = await db
 				.insert(userTable)
-				.values({
-					githubId: githubUser.id,
-					githubUsername: githubUser.login
-				})
+				.values({ name: githubUser.name, email: githubUser.email })
 				.returning();
+			await db.insert(oauthAccountTable).values({
+				providerId: 'github',
+				providerUserId: githubUser.id.toString(),
+				userId: user.id
+			});
 
-			const session = await lucia.createSession(user[0].id, {});
+			const session = await lucia.createSession(user.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
@@ -63,17 +68,14 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		// the specific error message depends on the provider
 		if (e instanceof OAuth2RequestError) {
 			// invalid code
-			return new Response(null, {
-				status: 400
-			});
+			return new Response(null, { status: 400 });
 		}
-		return new Response(null, {
-			status: 500
-		});
+		return new Response(null, { status: 500 });
 	}
 }
 
 interface GitHubUser {
 	id: number;
-	login: string;
+	name: string;
+	email: string;
 }

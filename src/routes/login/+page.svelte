@@ -21,6 +21,7 @@
 					</form>
 				{:else}
 					<a class="btn btn-primary" href="/login/github">Sign in with GitHub</a>
+					<a class="btn btn-primary" href="/login/google">Sign in with Google</a>
 				{/if}
 			</div>
 		</div>

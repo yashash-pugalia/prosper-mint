@@ -5,7 +5,7 @@
 </script>
 
 <h1 class="text-3xl font-mono my-4">
-	Hi {data.user?.username}
+	Hi {data.user?.name}
 </h1>
 
 <div class="flex gap-4">

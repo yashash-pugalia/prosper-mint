@@ -1,12 +1,19 @@
-import { integer, pgEnum, pgTable, real, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+	integer,
+	pgEnum,
+	pgTable,
+	primaryKey,
+	real,
+	serial,
+	text,
+	timestamp
+} from 'drizzle-orm/pg-core';
 
 export const userTable = pgTable('userTable', {
 	id: serial('id').primaryKey(),
 	createdAt: timestamp('createdAt').defaultNow().notNull(),
 	email: text('email').unique(),
-	name: text('name'),
-	githubId: integer('githubId').unique(),
-	githubUsername: text('githubUsername').unique()
+	name: text('name')
 });
 export const sessionTable = pgTable('sessionTable', {
 	id: text('id').primaryKey(),
@@ -15,6 +22,17 @@ export const sessionTable = pgTable('sessionTable', {
 		.notNull()
 		.references(() => userTable.id)
 });
+export const oauthAccountTable = pgTable(
+	'oauthAccountTable',
+	{
+		providerId: text('providerId').notNull(),
+		providerUserId: text('providerUserId').notNull(),
+		userId: integer('userId')
+			.notNull()
+			.references(() => userTable.id)
+	},
+	(table) => ({ pk: primaryKey({ columns: [table.providerId, table.providerUserId] }) })
+);
 
 export const bankTable = pgTable('bankTable', {
 	id: serial('id').primaryKey(),
