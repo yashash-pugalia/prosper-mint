@@ -38,7 +38,7 @@ export const bankTable = pgTable('bankTable', {
 	id: serial('id').primaryKey(),
 	accountNo: text('accountNo').notNull(),
 	balance: real('balance').default(10000).notNull(),
-	// TODO:  balance history an array storing balance and timestamp?
+	// TODO: feat?  balance history an array storing balance and timestamp?
 	ifsc: text('ifsc'),
 	name: text('name').notNull(),
 	swift: text('swift'),

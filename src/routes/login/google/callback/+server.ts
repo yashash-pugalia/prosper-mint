@@ -1,4 +1,4 @@
-import { github, lucia } from '$lib/server/auth';
+import { google, lucia } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { oauthAccountTable, userTable } from '$lib/server/schema';
 import { OAuth2RequestError } from 'arctic';
@@ -9,32 +9,28 @@ import type { RequestEvent } from '@sveltejs/kit';
 export async function GET(event: RequestEvent): Promise<Response> {
 	const code = event.url.searchParams.get('code');
 	const state = event.url.searchParams.get('state');
-	const storedState = event.cookies.get('github_oauth_state') ?? null;
 
-	if (!code || !state || !storedState || state !== storedState)
+	const storedState = event.cookies.get('GOOGLE_OAUTH_STATE');
+	const storedCodeVerifier = event.cookies.get('GOOGLE_OAUTH_CODE_VERIFIER');
+
+	if (!code || !state || !storedState || !storedCodeVerifier || state !== storedState)
 		return new Response(null, { status: 400 });
 
 	try {
-		const tokens = await github.validateAuthorizationCode(code);
-
-		const githubUserResponse = await fetch('https://api.github.com/user', {
+		const tokens = await google.validateAuthorizationCode(code, storedCodeVerifier);
+		const googleUserResponse = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
 			headers: { Authorization: `Bearer ${tokens.accessToken}` }
 		});
-		const githubEmailResponse = await fetch('https://api.github.com/user/emails', {
-			headers: { Authorization: `Bearer ${tokens.accessToken}` }
-		});
-		const githubUser: GitHubUser = await githubUserResponse.json();
-		const githubEmail: GitHubEmail[] = await githubEmailResponse.json();
 
-		const primaryEmail = githubEmail.find((email) => email.primary) ?? null;
+		const googleUser: GoogleUser = await googleUserResponse.json();
 
-		if (!primaryEmail || !primaryEmail.verified)
+		if (!googleUser.email || !googleUser.email_verified)
 			return new Response('No primary email or email unverified', { status: 400 });
 
 		const [existingUser] = await db
 			.select()
 			.from(userTable)
-			.where(eq(userTable.email, primaryEmail.email));
+			.where(eq(userTable.email, googleUser.email));
 
 		if (existingUser) {
 			const [existingOauthAccount] = await db
@@ -42,15 +38,15 @@ export async function GET(event: RequestEvent): Promise<Response> {
 				.from(oauthAccountTable)
 				.where(
 					and(
-						eq(oauthAccountTable.providerId, 'github'),
-						eq(oauthAccountTable.providerUserId, githubUser.id.toString())
+						eq(oauthAccountTable.providerId, 'google'),
+						eq(oauthAccountTable.providerUserId, googleUser.sub)
 					)
 				);
 			if (!existingOauthAccount) {
 				await db.insert(oauthAccountTable).values({
 					userId: existingUser.id,
-					providerId: 'github',
-					providerUserId: githubUser.id.toString()
+					providerId: 'google',
+					providerUserId: googleUser.sub
 				});
 			}
 
@@ -63,11 +59,12 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		} else {
 			const [user] = await db
 				.insert(userTable)
-				.values({ name: githubUser.name, email: githubUser.email })
+				.values({ name: googleUser.name, email: googleUser.email })
 				.returning();
+
 			await db.insert(oauthAccountTable).values({
-				providerId: 'github',
-				providerUserId: githubUser.id.toString(),
+				providerId: 'google',
+				providerUserId: googleUser.sub,
 				userId: user.id
 			});
 
@@ -87,13 +84,10 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	}
 }
 
-interface GitHubUser {
-	id: number;
+interface GoogleUser {
+	sub: string;
 	name: string;
+	picture: string;
 	email: string;
-}
-interface GitHubEmail {
-	email: string;
-	primary: boolean;
-	verified: boolean;
+	email_verified: boolean;
 }

@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
 import { bankTable, transactionTable } from '$lib/server/schema';
 import { fail } from '@sveltejs/kit';
-import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, lt } from 'drizzle-orm';
 import { merchants, tags } from '../store';
 
 export const load = async ({ locals, url }) => {
@@ -48,7 +48,7 @@ export const actions = {
 		}
 	},
 
-	update: async ({ request }) => {
+	update: async ({ request, locals }) => {
 		const formData = await request.formData();
 
 		const id = Number(formData.get('id'));
@@ -61,30 +61,29 @@ export const actions = {
 
 		if (!id) return fail(400, { message: 'Transaction ID is required.' });
 
-		// TODO: user must own the transaction account 		where(eq(transactionTable.userId, event.locals.user.id))
-
 		try {
 			await db
 				.update(transactionTable)
 				.set({ bankId, merchant, notes, tag })
-				.where(eq(transactionTable.id, id));
+				.where(and(eq(transactionTable.id, id), eq(transactionTable.userId, locals.user?.id!)));
 			return { message: 'Transaction details updated successfully' };
 		} catch (e) {
 			return fail(500, { message: `Error updating Transaction Details: ${e}` });
 		}
 	},
 
-	delete: async ({ request }) => {
+	delete: async ({ request, locals }) => {
 		const formData = await request.formData();
 
 		const id = Number(formData.get('id'));
 		if (!id) return fail(400, { message: 'Transaction ID is required.' });
 
-		// TODO: user must own the transaction account 		where(eq(transactionTable.userId, event.locals.user.id))
-
 		try {
-			await db.delete(transactionTable).where(eq(transactionTable.id, id));
-			return { message: 'Todo deleted successfully' };
+			await db
+				.delete(transactionTable)
+				.where(and(eq(transactionTable.id, id), eq(transactionTable.userId, locals.user?.id!)));
+
+			return { message: 'Transacttion deleted successfully' };
 		} catch (e) {
 			return fail(500, { message: `Error deleting Transaction: ${e}` });
 		}

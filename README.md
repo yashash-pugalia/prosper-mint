@@ -39,4 +39,4 @@ You can preview the production build with `npm run preview`.
 
 ## Setup
 
-add `.env` with POSTGRES_URL= (from vercel postgres)
+`.env.example` to `.env` and fill all details

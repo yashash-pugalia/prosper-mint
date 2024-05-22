@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
 import { bankTable } from '$lib/server/schema';
 import { fail } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 export const actions = {
 	add: async ({ request, locals }) => {
@@ -25,7 +25,7 @@ export const actions = {
 	},
 
 	// yet to be tested
-	update: async ({ request }) => {
+	update: async ({ request, locals }) => {
 		const formData = await request.formData();
 
 		const id = Number(formData.get('id'));
@@ -34,25 +34,27 @@ export const actions = {
 		const swift = formData.get('swift')?.toString().toUpperCase();
 		const ifsc = formData.get('ifsc')?.toString().toUpperCase();
 
-		// TODO: user must own the bank account 		where(eq(bankTable.userId, event.locals.user.id))
-
 		try {
-			await db.update(bankTable).set({ name, accountNo, swift, ifsc }).where(eq(bankTable.id, id));
+			await db
+				.update(bankTable)
+				.set({ name, accountNo, swift, ifsc })
+				.where(and(eq(bankTable.id, id), eq(bankTable.userId, locals.user?.id!)));
 			return { message: 'Bank details updated successfully' };
 		} catch (e) {
 			return fail(500, { message: `Error updating Bank Details: ${e}` });
 		}
 	},
 
-	delete: async ({ request }) => {
+	delete: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const id = Number(formData.get('id'));
 		if (!id) return fail(400, { message: 'Bank id is required.' });
 
-		// TODO: user must own the bank account 		where(eq(bankTable.userId, event.locals.user.id))
-
 		try {
-			await db.delete(bankTable).where(eq(bankTable.id, id));
+			await db
+				.delete(bankTable)
+				.where(and(eq(bankTable.id, id), eq(bankTable.userId, locals.user?.id!)));
+
 			return { message: 'Bank deleted successfully' };
 		} catch (e) {
 			return fail(500, { message: `Error deleting Bank: ${e}` });
