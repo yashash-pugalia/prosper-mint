@@ -1,4 +1,6 @@
 <script>
+	import Icon from '@iconify/svelte';
+
 	export let data;
 </script>
 
@@ -20,8 +22,14 @@
 						<button class="btn btn-primary w-full">Sign out</button>
 					</form>
 				{:else}
-					<a class="btn btn-primary" href="/login/github">Sign in with GitHub</a>
-					<a class="btn btn-primary" href="/login/google">Sign in with Google</a>
+					<a class="btn btn-primary" href="/login/github">
+						<Icon icon="fa6-brands:github" />
+						Continue with GitHub
+					</a>
+					<a class="btn btn-primary" href="/login/google">
+						<Icon icon="fa6-brands:google" />
+						Continue with Google
+					</a>
 				{/if}
 			</div>
 		</div>
