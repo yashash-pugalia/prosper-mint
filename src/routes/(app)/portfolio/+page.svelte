@@ -2,7 +2,23 @@
 	import { enhance } from '$app/forms';
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
-	import { banks } from '../store';
+
+	let allStocks: { prevClose: Number; symbol: String; companyName: String }[] = [];
+
+	onMount(async () => {
+		allStocks = await fetch('https://api-cache.yashash.dev/stocks.json')
+			.then((r) => r.json())
+			.then((r) => r.data.filter((s) => s.symbol !== 'NIFTY 500'))
+			.then((s) =>
+				s.map((s) => ({
+					prevClose: s.previousClose,
+					symbol: s.meta.symbol,
+					companyName: s.meta.companyName
+				}))
+			);
+
+		console.log(allStocks);
+	});
 
 	export let data;
 	console.log(data);
@@ -154,8 +170,8 @@
 				<span class="label-text">Stock:</span>
 				<select class="select select-bordered" name="name" required>
 					<option disabled selected>Select Stock</option>
-					{#each banks as e}
-						<option>{e}</option>
+					{#each allStocks as e}
+						<option value={e.symbol}>{e.companyName}</option>
 					{/each}
 				</select>
 			</label>
