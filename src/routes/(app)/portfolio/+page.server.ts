@@ -9,7 +9,7 @@ export const load = async ({ locals }) => {
 		const investments = await db
 			.select()
 			.from(investmentTable)
-			.where(eq(investmentTable.id, locals.user?.id!));
+			.where(eq(investmentTable.userId, locals.user?.id!));
 
 		return { investments }; // Return both brokers and investments
 	} catch (e) {
