@@ -61,23 +61,14 @@ export const transactionTable = pgTable('transactionTable', {
 	tag: text('tag')
 });
 
-export const brokerTable = pgTable('brokerTable', {
-	id: serial('id').primaryKey(),
-	accountNo: text('accountNo').notNull(),
-	name: text('name').notNull(),
-	userId: integer('userId')
-		.notNull()
-		.references(() => userTable.id, { onDelete: 'cascade' })
-});
-export const investmentTypeEnum = pgEnum('investmentType', ['stock', 'mf', 'bond', 'etf']);
 export const investmentTable = pgTable('investmentTable', {
 	id: serial('id').primaryKey(),
 	amount: real('amount').notNull(),
-	brokerId: integer('brokerId')
-		.references(() => brokerTable.id)
-		.notNull(),
 	createdAt: timestamp('createdAt').defaultNow().notNull(),
+	userId: integer('userId')
+		.notNull()
+		.references(() => userTable.id, { onDelete: 'cascade' }),
 	name: text('name').notNull(),
-	type: investmentTypeEnum('type').notNull(),
+	type: text('type').notNull(),
 	quantity: integer('quantity').notNull()
 });

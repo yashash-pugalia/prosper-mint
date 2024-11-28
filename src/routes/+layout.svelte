@@ -62,6 +62,14 @@
 						Portfolio
 					</a>
 					<a
+						href="/home"
+						class="btn btn-sm"
+						class:btn-active={$page.route.id === '/home'}
+					>
+						<Icon icon="material-symbols:monitoring-rounded" />
+						Home
+					</a>
+					<a
 						href="/transactions"
 						class="btn btn-sm"
 						class:btn-active={$page.route.id === '/transactions'}
