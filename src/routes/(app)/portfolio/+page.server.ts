@@ -3,19 +3,42 @@ import { investmentTable } from '$lib/server/schema';
 import { fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
-export const load = async ({ locals }) => {
-	try {
-		// Fetch all investments for the current user's brokers
-		const investments = await db
-			.select()
-			.from(investmentTable)
-			.where(eq(investmentTable.userId, locals.user?.id!));
+interface StocksResponse {
+	data: {
+		previousClose: number;
+		symbol: string;
+		meta: { companyName: string };
+	}[];
+}
 
-		return { investments }; // Return both brokers and investments
-	} catch (e) {
-		return fail(500, { message: `Error fetching portfolio data: ${e}` }); // Catch any errors during data retrieval
-	}
-};
+const res: StocksResponse = await fetch('https://api-cache.yashash.dev/stocks.json').then((r) =>
+	r.json()
+);
+const allStocks = res.data
+	.filter((s) => s.symbol !== 'NIFTY 500')
+	.map((s) => ({
+		prevClose: s.previousClose,
+		symbol: s.symbol,
+		companyName: s.meta.companyName
+	}));
+
+export const load = async ({ locals }) => ({
+	investments: await db
+		.select()
+		.from(investmentTable)
+		.where(eq(investmentTable.userId, locals.user?.id!))
+		.then((res) =>
+			res.map((e) => {
+				const stock = allStocks.find((s) => s.symbol === e.name);
+				return {
+					...e,
+					companyName: stock?.companyName || 'Unknown',
+					prevClose: stock?.prevClose || 0
+				};
+			})
+		),
+	allStocks
+});
 
 export const actions = {
 	// Add broker and investment

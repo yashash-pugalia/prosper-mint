@@ -3,23 +3,6 @@
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 
-	let allStocks: { prevClose: Number; symbol: String; companyName: String }[] = [];
-
-	onMount(async () => {
-		allStocks = await fetch('https://api-cache.yashash.dev/stocks.json')
-			.then((r) => r.json())
-			.then((r) => r.data.filter((s) => s.symbol !== 'NIFTY 500'))
-			.then((s) =>
-				s.map((s) => ({
-					prevClose: s.previousClose,
-					symbol: s.meta.symbol,
-					companyName: s.meta.companyName
-				}))
-			);
-
-		console.log(allStocks);
-	});
-
 	export let data;
 	console.log(data);
 
@@ -43,7 +26,7 @@
 	};
 
 	// Helper function to calculate total investment
-	const calculateTotal = (investments) =>
+	const calculateTotal = (investments: { amount: number }[]) =>
 		investments.reduce((total, investment) => total + investment.amount, 0);
 
 	onMount(() => {
@@ -89,7 +72,7 @@
 </div>
 
 <!-- Modals -->
- <!-- <dialog id="stockModal" class="modal">
+<!-- <dialog id="stockModal" class="modal">
 	<div class="modal-box">
 		<form method="dialog">
 			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
@@ -124,9 +107,7 @@
 						<p>Units: {fund.units}</p>
 						<p>Net Asset Value (NAV): ₹{fund.nav ?? 'N/A'}</p>
 					</div>
-					<button class="btn btn-outline btn-sm mt-4">
-						View Details
-					</button>
+					<button class="btn btn-outline btn-sm mt-4"> View Details </button>
 				</div>
 			{/each}
 		</div>
@@ -136,7 +117,6 @@
 		<button>Close</button>
 	</form>
 </dialog>
- 
 
 <dialog id="stockModal" class="modal">
 	<div class="modal-box max-w-4xl">
@@ -149,15 +129,14 @@
 				<div class="bg-white border rounded shadow-sm p-4 flex flex-col">
 					<div class="flex justify-between items-center mb-2">
 						<span class="font-semibold">{stock.name}</span>
-						<span class="font-bold text-green-600">₹{stock.amount}</span>
+						<span class="font-bold text-green-600">₹{stock.amount * stock.prevClose}</span>
 					</div>
 					<div class="text-sm text-gray-500">
 						<p>Quantity: {stock.quantity}</p>
-						<p>Last Trading Price: ₹{stock.lastPrice ?? 'N/A'}</p>
+						<p>Buy Price: ₹{stock.amount}</p>
+						<p>Last Trading Price: ₹{stock.prevClose ?? 'N/A'}</p>
 					</div>
-					<button class="btn btn-outline btn-sm mt-4">
-						View Details
-					</button>
+					<button class="btn btn-outline btn-sm mt-4"> View Details </button>
 				</div>
 			{/each}
 		</div>
@@ -168,37 +147,33 @@
 	</form>
 </dialog>
 
-
 <dialog id="fdModal" class="modal">
-  <div class="modal-box max-w-4xl">
-    <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-    </form>
-    <h3 class="font-bold text-lg">Fixed Deposits</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-      {#each data2.fds ?? [] as fd (fd.name)}
-        <div class="bg-white border rounded shadow-sm p-4 flex flex-col">
-          <div class="flex justify-between items-center mb-2">
-            <span class="font-semibold">{fd.name}</span>
-            <span class="font-bold text-green-600">₹{fd.amount}</span>
-          </div>
-          <div class="text-sm text-gray-500">
-            <p>Term: {fd.term}</p>
-            <p>Interest Rate: {fd.interestRate}</p>
-          </div>
-          <button class="btn btn-outline btn-sm mt-4">
-            View Details
-          </button>
-        </div>
-      {/each}
-    </div>
-    <p class="font-bold mt-6 text-right">Total: ₹{calculateTotal(data2.fds)}</p>
-  </div>
-  <form method="dialog" class="modal-backdrop">
-    <button>Close</button>
-  </form>
+	<div class="modal-box max-w-4xl">
+		<form method="dialog">
+			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+		</form>
+		<h3 class="font-bold text-lg">Fixed Deposits</h3>
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+			{#each data2.fds ?? [] as fd (fd.name)}
+				<div class="bg-white border rounded shadow-sm p-4 flex flex-col">
+					<div class="flex justify-between items-center mb-2">
+						<span class="font-semibold">{fd.name}</span>
+						<span class="font-bold text-green-600">₹{fd.amount}</span>
+					</div>
+					<div class="text-sm text-gray-500">
+						<p>Term: {fd.term}</p>
+						<p>Interest Rate: {fd.interestRate}</p>
+					</div>
+					<button class="btn btn-outline btn-sm mt-4"> View Details </button>
+				</div>
+			{/each}
+		</div>
+		<p class="font-bold mt-6 text-right">Total: ₹{calculateTotal(data2.fds)}</p>
+	</div>
+	<form method="dialog" class="modal-backdrop">
+		<button>Close</button>
+	</form>
 </dialog>
-
 
 <button class="btn btn-primary" on:click={() => addInvestments.showModal()}>
 	Add new Investment
@@ -228,7 +203,7 @@
 				<span class="label-text">Stock:</span>
 				<select class="select select-bordered" name="name" required>
 					<option disabled selected>Select Stock</option>
-					{#each allStocks as e}
+					{#each data.allStocks ?? [] as e}
 						<option value={e.symbol}>{e.companyName}</option>
 					{/each}
 				</select>
