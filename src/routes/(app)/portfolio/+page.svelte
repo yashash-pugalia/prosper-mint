@@ -89,7 +89,7 @@
 </div>
 
 <!-- Modals -->
-<dialog id="stockModal" class="modal">
+<!-- <dialog id="stockModal" class="modal">
 	<div class="modal-box">
 		<form method="dialog">
 			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
@@ -123,7 +123,37 @@
 	<form method="dialog" class="modal-backdrop">
 		<button>Close</button>
 	</form>
+</dialog> -->
+<dialog id="stockModal" class="modal">
+	<div class="modal-box max-w-4xl">
+		<form method="dialog">
+			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+		</form>
+		<h3 class="font-bold text-lg">Portfolio Stocks</h3>
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+			{#each data.investments ?? [] as stock (stock.name)}
+				<div class="bg-white border rounded shadow-sm p-4 flex flex-col">
+					<div class="flex justify-between items-center mb-2">
+						<span class="font-semibold">{stock.name}</span>
+						<span class="font-bold text-green-600">₹{stock.amount}</span>
+					</div>
+					<div class="text-sm text-gray-500">
+						<p>Quantity: {stock.quantity}</p>
+						<p>Last Trading Price: ₹{stock.lastPrice ?? 'N/A'}</p>
+					</div>
+					<button class="btn btn-outline btn-sm mt-4">
+						View Details
+					</button>
+				</div>
+			{/each}
+		</div>
+		<p class="font-bold mt-6 text-right">Total: ₹{calculateTotal(data.investments)}</p>
+	</div>
+	<form method="dialog" class="modal-backdrop">
+		<button>Close</button>
+	</form>
 </dialog>
+
 
 <dialog id="fdModal" class="modal">
 	<div class="modal-box">
