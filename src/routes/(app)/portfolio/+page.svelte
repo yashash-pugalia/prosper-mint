@@ -89,7 +89,7 @@
 </div>
 
 <!-- Modals -->
-<!-- <dialog id="stockModal" class="modal">
+ <!-- <dialog id="stockModal" class="modal">
 	<div class="modal-box">
 		<form method="dialog">
 			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
@@ -105,25 +105,39 @@
 	<form method="dialog" class="modal-backdrop">
 		<button>Close</button>
 	</form>
-</dialog>
+</dialog> -->
 
 <dialog id="mutualFundModal" class="modal">
-	<div class="modal-box">
+	<div class="modal-box max-w-4xl">
 		<form method="dialog">
 			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
 		</form>
 		<h3 class="font-bold text-lg">Mutual Funds</h3>
-		<ul>
-			{#each data2.mutualFunds as fund}
-				<li>{fund.name}: ₹{fund.amount}</li>
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+			{#each data2.mutualFunds ?? [] as fund (fund.name)}
+				<div class="bg-white border rounded shadow-sm p-4 flex flex-col">
+					<div class="flex justify-between items-center mb-2">
+						<span class="font-semibold">{fund.name}</span>
+						<span class="font-bold text-green-600">₹{fund.amount}</span>
+					</div>
+					<div class="text-sm text-gray-500">
+						<p>Units: {fund.units}</p>
+						<p>Net Asset Value (NAV): ₹{fund.nav ?? 'N/A'}</p>
+					</div>
+					<button class="btn btn-outline btn-sm mt-4">
+						View Details
+					</button>
+				</div>
 			{/each}
-		</ul>
-		<p class="font-bold mt-4">Total: ₹{calculateTotal(data2.mutualFunds)}</p>
+		</div>
+		<p class="font-bold mt-6 text-right">Total: ₹{calculateTotal(data2.mutualFunds)}</p>
 	</div>
 	<form method="dialog" class="modal-backdrop">
 		<button>Close</button>
 	</form>
-</dialog> -->
+</dialog>
+ 
+
 <dialog id="stockModal" class="modal">
 	<div class="modal-box max-w-4xl">
 		<form method="dialog">
@@ -156,22 +170,36 @@
 
 
 <dialog id="fdModal" class="modal">
-	<div class="modal-box">
-		<form method="dialog">
-			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-		</form>
-		<h3 class="font-bold text-lg">Fixed Deposits</h3>
-		<ul>
-			{#each data2.fds as fd}
-				<li>{fd.name}: ₹{fd.amount}</li>
-			{/each}
-		</ul>
-		<p class="font-bold mt-4">Total: ₹{calculateTotal(data2.fds)}</p>
-	</div>
-	<form method="dialog" class="modal-backdrop">
-		<button>Close</button>
-	</form>
+  <div class="modal-box max-w-4xl">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h3 class="font-bold text-lg">Fixed Deposits</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+      {#each data2.fds ?? [] as fd (fd.name)}
+        <div class="bg-white border rounded shadow-sm p-4 flex flex-col">
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-semibold">{fd.name}</span>
+            <span class="font-bold text-green-600">₹{fd.amount}</span>
+          </div>
+          <div class="text-sm text-gray-500">
+            <p>Term: {fd.term}</p>
+            <p>Interest Rate: {fd.interestRate}</p>
+          </div>
+          <button class="btn btn-outline btn-sm mt-4">
+            View Details
+          </button>
+        </div>
+      {/each}
+    </div>
+    <p class="font-bold mt-6 text-right">Total: ₹{calculateTotal(data2.fds)}</p>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>Close</button>
+  </form>
 </dialog>
+
+
 <button class="btn btn-primary" on:click={() => addInvestments.showModal()}>
 	Add new Investment
 </button>
