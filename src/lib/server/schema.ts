@@ -63,11 +63,11 @@ export const transactionTable = pgTable('transactionTable', {
 
 export const investmentTable = pgTable('investmentTable', {
 	id: serial('id').primaryKey(),
-	amount: real('amount').notNull(),
 	createdAt: timestamp('createdAt').defaultNow().notNull(),
 	userId: integer('userId')
 		.notNull()
 		.references(() => userTable.id, { onDelete: 'cascade' }),
+	amount: real('amount').notNull(),
 	name: text('name').notNull(),
 	type: text('type').notNull(),
 	quantity: integer('quantity').notNull()

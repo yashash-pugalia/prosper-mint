@@ -4,6 +4,9 @@
 	import { onMount } from 'svelte';
 	import { banks } from '../store';
 
+	export let data;
+	console.log(data);
+
 	let stockModal: HTMLDialogElement;
 	let mutualFundModal: HTMLDialogElement;
 	let fdModal: HTMLDialogElement;
@@ -12,19 +15,15 @@
 		addInvestments = document.getElementById('addInvestments') as HTMLDialogElement;
 	});
 	// Sample data for investments
-	let data = {
-		stocks: [
-			{ name: 'Stock A', amount: 5000 },
-			{ name: 'Stock B', amount: 8000 },
-		],
+	let data2 = {
 		mutualFunds: [
 			{ name: 'Fund A', amount: 15000 },
-			{ name: 'Fund B', amount: 12000 },
+			{ name: 'Fund B', amount: 12000 }
 		],
 		fds: [
 			{ name: 'FD A', amount: 20000 },
-			{ name: 'FD B', amount: 25000 },
-		],
+			{ name: 'FD B', amount: 25000 }
+		]
 	};
 
 	// Helper function to calculate total investment
@@ -43,11 +42,8 @@
 	<div class="bg-base-100 rounded border grow">
 		<div class="flex gap-2 items-center border-b px-4 py-2">
 			<span class="font-semibold text-lg">Portfolio Stocks</span>
-			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data.stocks)}</span>
-			<button
-				class="btn btn-ghost btn-square btn-sm"
-				on:click={() => stockModal.showModal()}
-			>
+			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data.investments)}</span>
+			<button class="btn btn-ghost btn-square btn-sm" on:click={() => stockModal.showModal()}>
 				<Icon icon="material-symbols:info-outline" class="text-lg" />
 			</button>
 		</div>
@@ -57,11 +53,8 @@
 	<div class="bg-base-100 rounded border grow">
 		<div class="flex gap-2 items-center border-b px-4 py-2">
 			<span class="font-semibold text-lg">Mutual Funds</span>
-			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data.mutualFunds)}</span>
-			<button
-				class="btn btn-ghost btn-square btn-sm"
-				on:click={() => mutualFundModal.showModal()}
-			>
+			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data2.mutualFunds)}</span>
+			<button class="btn btn-ghost btn-square btn-sm" on:click={() => mutualFundModal.showModal()}>
 				<Icon icon="material-symbols:info-outline" class="text-lg" />
 			</button>
 		</div>
@@ -71,11 +64,8 @@
 	<div class="bg-base-100 rounded border grow">
 		<div class="flex gap-2 items-center border-b px-4 py-2">
 			<span class="font-semibold text-lg">Fixed Deposits</span>
-			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data.fds)}</span>
-			<button
-				class="btn btn-ghost btn-square btn-sm"
-				on:click={() => fdModal.showModal()}
-			>
+			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data2.fds)}</span>
+			<button class="btn btn-ghost btn-square btn-sm" on:click={() => fdModal.showModal()}>
 				<Icon icon="material-symbols:info-outline" class="text-lg" />
 			</button>
 		</div>
@@ -90,11 +80,11 @@
 		</form>
 		<h3 class="font-bold text-lg">Portfolio Stocks</h3>
 		<ul>
-			{#each data.stocks as stock}
+			{#each data.investments ?? [] as stock}
 				<li>{stock.name}: ₹{stock.amount}</li>
 			{/each}
 		</ul>
-		<p class="font-bold mt-4">Total: ₹{calculateTotal(data.stocks)}</p>
+		<p class="font-bold mt-4">Total: ₹{calculateTotal(data.investments)}</p>
 	</div>
 	<form method="dialog" class="modal-backdrop">
 		<button>Close</button>
@@ -108,11 +98,11 @@
 		</form>
 		<h3 class="font-bold text-lg">Mutual Funds</h3>
 		<ul>
-			{#each data.mutualFunds as fund}
+			{#each data2.mutualFunds as fund}
 				<li>{fund.name}: ₹{fund.amount}</li>
 			{/each}
 		</ul>
-		<p class="font-bold mt-4">Total: ₹{calculateTotal(data.mutualFunds)}</p>
+		<p class="font-bold mt-4">Total: ₹{calculateTotal(data2.mutualFunds)}</p>
 	</div>
 	<form method="dialog" class="modal-backdrop">
 		<button>Close</button>
@@ -126,17 +116,19 @@
 		</form>
 		<h3 class="font-bold text-lg">Fixed Deposits</h3>
 		<ul>
-			{#each data.fds as fd}
+			{#each data2.fds as fd}
 				<li>{fd.name}: ₹{fd.amount}</li>
 			{/each}
 		</ul>
-		<p class="font-bold mt-4">Total: ₹{calculateTotal(data.fds)}</p>
+		<p class="font-bold mt-4">Total: ₹{calculateTotal(data2.fds)}</p>
 	</div>
 	<form method="dialog" class="modal-backdrop">
 		<button>Close</button>
 	</form>
 </dialog>
-<button class="btn btn-primary" on:click={() => addInvestments.showModal()}> Add new Investment </button>
+<button class="btn btn-primary" on:click={() => addInvestments.showModal()}>
+	Add new Investment
+</button>
 
 <dialog id="addInvestments" class="modal">
 	<div class="modal-box">
@@ -172,18 +164,14 @@
 				<input
 					type="number"
 					class="input input-bordered"
-					name="accountNo"
+					name="amount"
 					placeholder="Type here"
 					required
 				/>
 			</label>
 			<label class="form-control">
-				<span class="label-text">Name:</span>
-				<input type="text" class="input input-bordered" placeholder="Type here" name="ifsc" />
-			</label>
-			<label class="form-control">
 				<span class="label-text">Quantity:</span>
-				<input type="text" class="input input-bordered" placeholder="Type here" name="swift" />
+				<input type="text" class="input input-bordered" placeholder="Type here" name="quantity" />
 			</label>
 			<button class="btn btn-primary" type="submit">Save</button>
 		</form>

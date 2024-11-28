@@ -1,31 +1,43 @@
 import { db } from '$lib/server/db';
 import { investmentTable } from '$lib/server/schema';
 import { fail } from '@sveltejs/kit';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+
+export const load = async ({ locals }) => {
+	try {
+		// Fetch all investments for the current user's brokers
+		const investments = await db
+			.select()
+			.from(investmentTable)
+			.where(eq(investmentTable.id, locals.user?.id!));
+
+		return { investments }; // Return both brokers and investments
+	} catch (e) {
+		return fail(500, { message: `Error fetching portfolio data: ${e}` }); // Catch any errors during data retrieval
+	}
+};
 
 export const actions = {
 	// Add broker and investment
 	add: async (event) => {
 		const { request, locals } = event;
 		const formData = await request.formData();
-		console.log(formData);
 
 		const userId = locals.user?.id!;
 		const name = formData.get('name')?.toString();
-		const accountNo = formData.get('accountNo')?.toString();
 		const amount = parseFloat(formData.get('amount')?.toString() || '0');
 		const quantity = parseInt(formData.get('quantity')?.toString() || '0');
-		const type = formData.get('type')?.toString();
+		const type = 'stocks';
 
 		// Validate required fields
-		if (!name || !accountNo || !userId || !amount || !quantity || !type) {
+		if (!name || !userId || !amount || !quantity || !type) {
 			return fail(400, { message: 'All fields are required' });
 		}
 
 		try {
 			await db.insert(investmentTable).values({ amount, userId, name, type, quantity });
 
-			return { message: 'Broker and Investment added successfully' }; // Return success message
+			return { message: 'Investment added successfully' }; // Return success message
 		} catch (e) {
 			return fail(500, { message: `Error adding to portfolio: ${e}` }); // Catch any errors during insertion
 		}
@@ -70,23 +82,6 @@ export const actions = {
 			return { message: 'Broker and associated investments deleted successfully' };
 		} catch (e) {
 			return fail(500, { message: `Error deleting portfolio: ${e}` }); // Catch any errors during deletion
-		}
-	},
-
-	// Fetch all broker and investment data for the portfolio page
-	fetchPortfolio: async (event) => {
-		const { locals } = event;
-
-		try {
-			// Fetch all investments for the current user's brokers
-			const investments = await db
-				.select()
-				.from(investmentTable)
-				.where(eq(investmentTable.id, locals.user?.id!));
-
-			return { investments }; // Return both brokers and investments
-		} catch (e) {
-			return fail(500, { message: `Error fetching portfolio data: ${e}` }); // Catch any errors during data retrieval
 		}
 	}
 };
