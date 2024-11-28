@@ -69,6 +69,6 @@ export const investmentTable = pgTable('investmentTable', {
 		.references(() => userTable.id, { onDelete: 'cascade' }),
 	amount: real('amount').notNull(),
 	name: text('name').notNull(),
-	type: text('type').notNull(),
+	type: text('type').notNull(), // stock mf fd
 	quantity: integer('quantity').notNull()
 });

@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
+	import { slide } from 'svelte/transition';
 
 	export let data;
 	console.log(data);
@@ -14,16 +15,6 @@
 		addInvestments = document.getElementById('addInvestments') as HTMLDialogElement;
 	});
 	// Sample data for investments
-	let data2 = {
-		mutualFunds: [
-			{ name: 'Fund A', amount: 15000 },
-			{ name: 'Fund B', amount: 12000 }
-		],
-		fds: [
-			{ name: 'FD A', amount: 20000 },
-			{ name: 'FD B', amount: 25000 }
-		]
-	};
 
 	// Helper function to calculate total investment
 	const calculateTotal = (investments: { amount: number }[]) =>
@@ -41,7 +32,9 @@
 	<div class="bg-base-100 rounded border grow">
 		<div class="flex gap-2 items-center border-b px-4 py-2">
 			<span class="font-semibold text-lg">Portfolio Stocks</span>
-			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data.investments)}</span>
+			<span class="ml-auto font-bold text-green-600"
+				>₹{calculateTotal(data.investments.filter((i) => i.type === 'stocks'))}</span
+			>
 
 			<button class="btn btn-ghost btn-square btn-sm" on:click={() => addInvestments.showModal()}>
 				<Icon icon="material-symbols:add-circle" class="text-lg" />
@@ -49,7 +42,7 @@
 		</div>
 
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-			{#each data.investments ?? [] as stock (stock.name)}
+			{#each data.investments.filter((i) => i.type === 'stocks') ?? [] as stock (stock.name)}
 				<div class="bg-white border rounded shadow-sm p-4 flex flex-col">
 					<div class="flex justify-between items-center mb-2">
 						<span class="font-semibold">{stock.name}</span>
@@ -60,7 +53,18 @@
 						<p>Buy Price: ₹{stock.amount}</p>
 						<p>Last Trading Price: ₹{stock.prevClose ?? 'N/A'}</p>
 					</div>
-					<button class="btn btn-outline btn-sm mt-4"> View Details </button>
+
+					{#if stock.showChart}
+						<img transition:slide src={stock.chart365dPath} alt="" />
+					{/if}
+
+					<button
+						class="btn btn-outline btn-sm mt-4"
+						on:click={() =>
+							(stock.showChart = stock.showChart === undefined ? true : !stock.showChart)}
+					>
+						View/Hide Price Graph
+					</button>
 				</div>
 			{/each}
 		</div>
@@ -70,13 +74,15 @@
 	<div class="bg-base-100 rounded border grow">
 		<div class="flex gap-2 items-center border-b px-4 py-2">
 			<span class="font-semibold text-lg">Mutual Funds</span>
-			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data2.mutualFunds)}</span>
+			<span class="ml-auto font-bold text-green-600">
+				₹{calculateTotal(data.investments.filter((i) => i.type === 'mf'))}
+			</span>
 			<button class="btn btn-ghost btn-square btn-sm" on:click={() => mutualFundModal.showModal()}>
 				<Icon icon="material-symbols:info-outline" class="text-lg" />
 			</button>
 		</div>
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-			{#each data2.mutualFunds ?? [] as fund (fund.name)}
+			{#each data.investments.filter((i) => i.type === 'mf') ?? [] as fund (fund.name)}
 				<div class="bg-white border rounded shadow-sm p-4 flex flex-col">
 					<div class="flex justify-between items-center mb-2">
 						<span class="font-semibold">{fund.name}</span>
@@ -84,7 +90,7 @@
 					</div>
 					<div class="text-sm text-gray-500">
 						<p>Units: {fund.quantity}</p>
-						<p>Net Asset Value (NAV): ₹{fund.nav ?? 'N/A'}</p>
+						<p>Net Asset Value (NAV): ₹{fund.amount ?? 'N/A'}</p>
 					</div>
 					<button class="btn btn-outline btn-sm mt-4"> View Details </button>
 				</div>
@@ -96,13 +102,13 @@
 	<div class="bg-base-100 rounded border grow">
 		<div class="flex gap-2 items-center border-b px-4 py-2">
 			<span class="font-semibold text-lg">Fixed Deposits</span>
-			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data2.fds)}</span>
+			<span class="ml-auto font-bold text-green-600">₹{data.investments.filter((i) => i.type === 'fd')}</span>
 			<button class="btn btn-ghost btn-square btn-sm" on:click={() => fdModal.showModal()}>
 				<Icon icon="material-symbols:info-outline" class="text-lg" />
 			</button>
 		</div>
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-			{#each data2.fds ?? [] as fd (fd.name)}
+			{#each data.investments.filter((i) => i.type === 'fd') ?? [] as fd (fd.name)}
 				<div class="bg-white border rounded shadow-sm p-4 flex flex-col">
 					<div class="flex justify-between items-center mb-2">
 						<span class="font-semibold">{fd.name}</span>

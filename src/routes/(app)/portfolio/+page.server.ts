@@ -7,6 +7,7 @@ interface StocksResponse {
 	data: {
 		previousClose: number;
 		symbol: string;
+		chart365dPath: string;
 		meta: { companyName: string };
 	}[];
 }
@@ -19,7 +20,8 @@ const allStocks = res.data
 	.map((s) => ({
 		prevClose: s.previousClose,
 		symbol: s.symbol,
-		companyName: s.meta.companyName
+		companyName: s.meta.companyName,
+		chart365dPath: s.chart365dPath
 	}));
 
 export const load = async ({ locals }) => ({
@@ -33,7 +35,8 @@ export const load = async ({ locals }) => ({
 				return {
 					...e,
 					companyName: stock?.companyName || 'Unknown',
-					prevClose: stock?.prevClose || 0
+					prevClose: stock?.prevClose || 0,
+					chart365dPath: stock?.chart365dPath || ''
 				};
 			})
 		),
@@ -50,7 +53,7 @@ export const actions = {
 		const name = formData.get('name')?.toString();
 		const amount = parseFloat(formData.get('amount')?.toString() || '0');
 		const quantity = parseInt(formData.get('quantity')?.toString() || '0');
-		const type = 'stocks';
+		const type = formData.get('type')?.toString() ?? 'stocks';
 
 		// Validate required fields
 		if (!name || !userId || !amount || !quantity || !type) {
