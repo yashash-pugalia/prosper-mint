@@ -42,9 +42,27 @@
 		<div class="flex gap-2 items-center border-b px-4 py-2">
 			<span class="font-semibold text-lg">Portfolio Stocks</span>
 			<span class="ml-auto font-bold text-green-600">₹{calculateTotal(data.investments)}</span>
-			<button class="btn btn-ghost btn-square btn-sm" on:click={() => stockModal.showModal()}>
-				<Icon icon="material-symbols:info-outline" class="text-lg" />
+
+			<button class="btn btn-ghost btn-square btn-sm"  on:click={() => addInvestments.showModal()}>
+				<Icon icon="material-symbols:add-circle" class="text-lg" />
 			</button>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+			{#each data.investments ?? [] as stock (stock.name)}
+				<div class="bg-white border rounded shadow-sm p-4 flex flex-col">
+					<div class="flex justify-between items-center mb-2">
+						<span class="font-semibold">{stock.name}</span>
+						<span class="font-bold text-green-600">₹{stock.amount * stock.prevClose}</span>
+					</div>
+					<div class="text-sm text-gray-500">
+						<p>Quantity: {stock.quantity}</p>
+						<p>Buy Price: ₹{stock.amount}</p>
+						<p>Last Trading Price: ₹{stock.prevClose ?? 'N/A'}</p>
+					</div>
+					<button class="btn btn-outline btn-sm mt-4"> View Details </button>
+				</div>
+			{/each}
 		</div>
 	</div>
 
@@ -174,10 +192,6 @@
 		<button>Close</button>
 	</form>
 </dialog>
-
-<button class="btn btn-primary" on:click={() => addInvestments.showModal()}>
-	Add new Investment
-</button>
 
 <dialog id="addInvestments" class="modal">
 	<div class="modal-box">
