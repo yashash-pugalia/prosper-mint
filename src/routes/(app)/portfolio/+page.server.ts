@@ -11,7 +11,6 @@ interface StocksResponse {
 		meta: { companyName: string };
 	}[];
 }
-
 const res: StocksResponse = await fetch('https://api-cache.yashash.dev/stocks.json').then((r) =>
 	r.json()
 );
@@ -32,12 +31,30 @@ export const load = async ({ locals }) => ({
 		.then((res) =>
 			res.map((e) => {
 				const stock = allStocks.find((s) => s.symbol === e.name);
-				return {
-					...e,
-					companyName: stock?.companyName || 'Unknown',
-					prevClose: stock?.prevClose || 0,
-					chart365dPath: stock?.chart365dPath || ''
-				};
+
+				if (e.type === 'stocks') {
+					return {
+						...e,
+						companyName: stock?.companyName || e.name,
+						prevClose: stock?.prevClose || e.amount,
+						chart365dPath: stock?.chart365dPath || ''
+					};
+				} else if (e.type === 'mf') {
+					return {
+						...e,
+						companyName: e.name,
+						prevClose: e.amount + (0.5 - Math.random()) * e.amount,
+						chart365dPath: ''
+					};
+				} else {
+					// its an FD
+					return {
+						...e,
+						companyName: e.name,
+						prevClose: e.amount + (e.amount * 7 * e.quantity) / 100,
+						chart365dPath: ''
+					};
+				}
 			})
 		),
 	allStocks
@@ -45,8 +62,7 @@ export const load = async ({ locals }) => ({
 
 export const actions = {
 	// Add broker and investment
-	add: async (event) => {
-		const { request, locals } = event;
+	add: async ({ request, locals }) => {
 		const formData = await request.formData();
 
 		const userId = locals.user?.id!;
@@ -55,10 +71,10 @@ export const actions = {
 		const quantity = parseInt(formData.get('quantity')?.toString() || '0');
 		const type = formData.get('type')?.toString() ?? 'stocks';
 
-		// Validate required fields
-		if (!name || !userId || !amount || !quantity || !type) {
+		if (!name || !userId || !amount || !quantity || !type)
 			return fail(400, { message: 'All fields are required' });
-		}
+		if (!['stocks', 'mf', 'fd'].includes(type))
+			return fail(400, { message: 'Invalid investment type' });
 
 		try {
 			await db.insert(investmentTable).values({ amount, userId, name, type, quantity });
@@ -70,8 +86,7 @@ export const actions = {
 	},
 
 	// Update broker or investment
-	update: async (event) => {
-		const { request, locals } = event;
+	update: async ({ request, locals }) => {
 		const formData = await request.formData();
 
 		const id = Number(formData.get('id'));
@@ -94,8 +109,7 @@ export const actions = {
 	},
 
 	// Delete broker and investment
-	delete: async (event) => {
-		const { request, locals } = event;
+	delete: async ({ request, locals }) => {
 		const formData = await request.formData();
 
 		const id = Number(formData.get('id'));
