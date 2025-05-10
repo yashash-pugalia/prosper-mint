@@ -27,30 +27,29 @@
 			toast('Please add a bank first');
 			goto('/banks');
 		}
-
-		document.querySelector('#importModal')?.showModal();
 	});
 </script>
 
 <div class="flex flex-col gap-2 py-4">
-	<div class="flex justify-end mb-2">
+	<div class="flex gap-4 justify-between">
+		<form class="flex self-center" action="?/add" method="post" use:enhance>
+			<input
+				class="input input-bordered rounded-r-none"
+				type="number"
+				step="0.01"
+				placeholder="Enter Amount"
+				name="amount"
+			/>
+			<button class="btn btn-primary rounded-l-none" type="submit">Add</button>
+		</form>
+
 		<button
-			class="btn btn-accent"
+			class="btn btn-accent self-end"
 			on:click={() => document.querySelector('#importModal')?.showModal()}
 		>
 			<Icon icon="material-symbols:upload" class="mr-2" /> Import Transactions
 		</button>
 	</div>
-	<form class="flex mx-auto" action="?/add" method="post" use:enhance>
-		<input
-			class="input input-bordered rounded-r-none"
-			type="number"
-			step="0.01"
-			placeholder="Enter Amount"
-			name="amount"
-		/>
-		<button class="btn btn-primary rounded-l-none" type="submit">Add</button>
-	</form>
 
 	<div class="flex gap-2 w-full">
 		<div
@@ -153,7 +152,13 @@
 								/>
 							</td>
 							<td>
-								<p>{t.createdAt.toLocaleString('default', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+								<p>
+									{t.createdAt.toLocaleString('default', {
+										month: 'short',
+										day: 'numeric',
+										year: 'numeric'
+									})}
+								</p>
 								<p class="text-sm font-light whitespace-nowrap">
 									{t.createdAt.toLocaleString('default', {
 										hour: 'numeric',
