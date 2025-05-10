@@ -87,5 +87,42 @@ export const actions = {
 		} catch (e) {
 			return fail(500, { message: `Error deleting Transaction: ${e}` });
 		}
+	},
+
+	import: async ({ request, locals }) => {
+		try {
+			const formData = await request.formData();
+			const transactionsRaw = formData.get('transactions');
+			if (typeof transactionsRaw !== 'string') {
+				return { status: 400, body: { message: 'Invalid transactions data.' } };
+			}
+			const transactions = JSON.parse(transactionsRaw);
+			if (!Array.isArray(transactions) || transactions.length === 0) {
+				return { status: 400, body: { message: 'No transactions provided.' } };
+			}
+
+			console.log('transactions valid?', transactions);
+
+			const userId = locals.user?.id!;
+
+			const res = await db.insert(transactionTable).values(
+				transactions.map((t) => ({
+					amount: t.amount,
+					bankId: t.bankId,
+					userId,
+					createdAt: parseDMY(t.date),
+					notes: t.notes
+				}))
+			);
+			console.log('res', res);
+			return { message: `Imported ${transactions.length} transactions successfully.` };
+		} catch (e) {
+			return fail(500, { message: `Error importing transactions: ${e}` });
+		}
 	}
 };
+
+function parseDMY(dmy: string) {
+	const [day, month, year] = dmy.split('/');
+	return new Date(`20${year}-${month}-${day}`);
+}

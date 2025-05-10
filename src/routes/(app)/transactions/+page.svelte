@@ -8,6 +8,7 @@
 	import { fly } from 'svelte/transition';
 	import { queryParam, ssp } from 'sveltekit-search-params';
 	import { merchants, tags } from '../store';
+	import ImportModal from './ImportModal.svelte';
 
 	export let form;
 	export let data;
@@ -26,10 +27,20 @@
 			toast('Please add a bank first');
 			goto('/banks');
 		}
+
+		document.querySelector('#importModal')?.showModal();
 	});
 </script>
 
 <div class="flex flex-col gap-2 py-4">
+	<div class="flex justify-end mb-2">
+		<button
+			class="btn btn-accent"
+			on:click={() => document.querySelector('#importModal')?.showModal()}
+		>
+			<Icon icon="material-symbols:upload" class="mr-2" /> Import Transactions
+		</button>
+	</div>
 	<form class="flex mx-auto" action="?/add" method="post" use:enhance>
 		<input
 			class="input input-bordered rounded-r-none"
@@ -142,7 +153,7 @@
 								/>
 							</td>
 							<td>
-								<p>{t.createdAt.toLocaleString('default', { month: 'short', day: 'numeric' })}</p>
+								<p>{t.createdAt.toLocaleString('default', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
 								<p class="text-sm font-light whitespace-nowrap">
 									{t.createdAt.toLocaleString('default', {
 										hour: 'numeric',
@@ -358,3 +369,5 @@
 		{/if}
 	</div>
 </div>
+
+<ImportModal banks={data.banks} />
