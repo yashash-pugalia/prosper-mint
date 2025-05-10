@@ -2,26 +2,20 @@ import { db } from '$lib/server/db';
 import { investmentTable } from '$lib/server/schema';
 import { fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import { getNseData, type StocksResponse } from './nsedata';
 
-interface StocksResponse {
-	data: {
-		previousClose: number;
-		symbol: string;
-		chart365dPath: string;
-		meta: { companyName: string };
-	}[];
-}
-const res: StocksResponse = await fetch('https://api-cache.yashash.dev/stocks.json').then((r) =>
-	r.json()
-);
+const res: StocksResponse = await getNseData();
+
 const allStocks = res.data
-	.filter((s) => s.symbol !== 'NIFTY 500')
+	.filter((s) => s.symbol !== 'NIFTY TOTAL MARKET')
 	.map((s) => ({
 		prevClose: s.previousClose,
 		symbol: s.symbol,
 		companyName: s.meta.companyName,
 		chart365dPath: s.chart365dPath
 	}));
+
+// const allStocks = [];
 
 export const load = async ({ locals }) => ({
 	investments: await db

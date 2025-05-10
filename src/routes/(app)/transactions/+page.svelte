@@ -4,6 +4,7 @@
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
 	import { queryParam, ssp } from 'sveltekit-search-params';
 	import { merchants, tags } from '../store';
@@ -129,6 +130,7 @@
 									.includes(search.toLowerCase()) &&
 								!t.notes?.toLowerCase().includes(search.toLowerCase())}
 							class:bg-base-200={showDetailsId === t.id}
+							animate:flip={{ duration: 200 }}
 						>
 							<td>
 								<input
