@@ -45,7 +45,7 @@
 
 		<button
 			class="btn btn-accent self-end"
-			on:click={() => document.querySelector('#importModal')?.showModal()}
+			on:click={() => (document.querySelector('#importModal') as HTMLDialogElement)?.showModal()}
 		>
 			<Icon icon="material-symbols:upload" class="mr-2" /> Import Transactions
 		</button>
@@ -359,7 +359,7 @@
 								placeholder="Notes"
 								name="notes"
 								value={t.notes}
-							/>
+							></textarea>
 						</label>
 
 						<div class="flex gap-2">
